@@ -1,18 +1,47 @@
 version: "3.8"
 
 services:
-  sc-rna-studio:
-    build: 
+  scratool:
+    build:
       context: .
       dockerfile: Dockerfile
-    container_name: scrna-studio
+    container_name: scratool
     ports:
       - "5000:5000"
     volumes:
-      # Mount the sessions, uploads, and Nextflow configs to ensure persistence across restarts
-      - ./webapp/sessions:/app/webapp/sessions
-      - ./webapp/uploads:/app/webapp/uploads
-      - ./nextflow/.server_config.json:/app/nextflow/.server_config.json
+      # Persist analysis results across container restarts
+      - ./results:/app/nextflow/results
+
+      # Persist user sessions and uploaded data
+      - ./sessions:/app/webapp/sessions
+      - ./uploads:/app/webapp/uploads
+
+      # Optional: Mount server config for remote execution mode
+      # Uncomment and create this file if you want to run on a remote server
+      # - ./server_config.json:/app/nextflow/.server_config.json
+
+      # Optional: Mount SSH keys for passwordless server access
+      # - ~/.ssh:/root/.ssh:ro
+
     environment:
       - FLASK_ENV=production
+
+    # Resource limits (adjust based on your machine)
+    deploy:
+      resources:
+        limits:
+          cpus: "16"
+          memory: 64G
+        reservations:
+          cpus: "4"
+          memory: 8G
+
     restart: unless-stopped
+
+    # Health check — verify the web UI is responding
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

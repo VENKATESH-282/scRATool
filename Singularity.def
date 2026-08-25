@@ -1,0 +1,143 @@
+Bootstrap: docker
+From: bioconductor/bioconductor_docker:RELEASE_3_19
+
+%labels
+    Author VENKATESH-282
+    Version 3.0.0
+    Description scRATool: End-to-end scRNA-seq analysis pipeline with web GUI
+
+%help
+    scRATool — Single-Cell RNA-seq Analysis Tool
+
+    Usage (interactive web GUI):
+        singularity run --bind /data:/data scratool.sif
+
+    Usage (command-line pipeline):
+        singularity exec --bind /data:/data scratool.sif \
+            bash -c "cd /app/nextflow && nextflow run main.nf --matrix samples.csv -profile local"
+
+    The web interface will be available at http://localhost:5000
+
+%post
+    # ── System Dependencies ──────────────────────────────────────────────────
+    apt-get update && apt-get install -y --no-install-recommends \
+        openssh-client \
+        rsync \
+        curl \
+        wget \
+        libhdf5-dev \
+        libgeos-dev \
+        libglpk-dev \
+        libxml2-dev \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        libfontconfig1-dev \
+        libfreetype6-dev \
+        libpng-dev \
+        libtiff5-dev \
+        libjpeg-dev \
+        libharfbuzz-dev \
+        libfribidi-dev \
+        libgdal-dev \
+        cmake \
+        python3-pip \
+        python3-venv \
+        default-jdk \
+    && rm -rf /var/lib/apt/lists/*
+
+    # ── R / Bioconductor Packages ────────────────────────────────────────────
+    # Core Seurat ecosystem
+    R -e "BiocManager::install(c( \
+        'Seurat', 'SeuratObject', 'sctransform', \
+        'hdf5r', 'Matrix', 'future', 'future.apply' \
+    ), update=FALSE, ask=FALSE, Ncpus=4)"
+
+    # QC & Preprocessing
+    R -e "BiocManager::install(c( \
+        'scDblFinder', 'SoupX', 'DropletUtils', \
+        'scater', 'scran', 'SingleCellExperiment' \
+    ), update=FALSE, ask=FALSE, Ncpus=4)"
+
+    # Integration & Clustering
+    R -e "BiocManager::install(c( \
+        'harmony', 'batchelor', 'cluster', \
+        'clustree', 'MAST' \
+    ), update=FALSE, ask=FALSE, Ncpus=4)"
+
+    # Annotation
+    R -e "BiocManager::install(c( \
+        'SingleR', 'celldex', 'AUCell', \
+        'clusterProfiler', 'org.Hs.eg.db', 'org.Mm.eg.db', \
+        'msigdbr', 'enrichplot', 'DOSE', 'fgsea' \
+    ), update=FALSE, ask=FALSE, Ncpus=4)"
+
+    # Differential Expression
+    R -e "BiocManager::install(c( \
+        'DESeq2', 'limma', 'edgeR', 'EnhancedVolcano' \
+    ), update=FALSE, ask=FALSE, Ncpus=4)"
+
+    # Trajectory
+    R -e "BiocManager::install(c( \
+        'slingshot', 'tradeSeq' \
+    ), update=FALSE, ask=FALSE, Ncpus=4)" || true
+
+    # Visualization & Utilities
+    R -e "BiocManager::install(c( \
+        'ComplexHeatmap', 'circlize', 'ggrepel', 'patchwork', \
+        'ggalluvial', 'viridis', 'RColorBrewer', \
+        'cowplot', 'gridExtra', 'pheatmap', \
+        'igraph', 'ggraph', 'NMF', 'tidyverse' \
+    ), update=FALSE, ask=FALSE, Ncpus=4)"
+
+    # CellChat (from GitHub)
+    R -e "if (!requireNamespace('remotes', quietly=TRUE)) install.packages('remotes', repos='https://cloud.r-project.org'); \
+        remotes::install_github('jinworks/CellChat', upgrade='never')" || true
+
+    # NicheNet (from GitHub)
+    R -e "remotes::install_github('saeyslab/nichenetr', upgrade='never')" || true
+
+    # CopyKAT (from GitHub)
+    R -e "remotes::install_github('navinlabcode/copykat', upgrade='never')" || true
+
+    # HGNChelper for scType
+    R -e "install.packages('HGNChelper', repos='https://cloud.r-project.org')"
+
+    # ── Python / Flask ───────────────────────────────────────────────────────
+    pip3 install --no-cache-dir --break-system-packages \
+        flask>=3.0.0 flask-cors>=4.0.0 werkzeug>=3.0.0 \
+        psutil>=5.9.0 pandas>=2.0.0 plotly>=5.18.0 \
+        kaleido>=0.2.1 pexpect>=4.8.0 requests>=2.31.0 GEOparse>=2.0.3
+
+    # ── Nextflow ─────────────────────────────────────────────────────────────
+    curl -s https://get.nextflow.io | bash
+    mv nextflow /usr/local/bin/
+    chmod +x /usr/local/bin/nextflow
+
+    # ── Create directories ───────────────────────────────────────────────────
+    mkdir -p /app/webapp/sessions /app/webapp/uploads /app/nextflow/results
+
+%files
+    webapp/          /app/webapp/
+    nextflow/        /app/nextflow/
+    config.R         /app/config.R
+    install_dependencies.R /app/install_dependencies.R
+    part2_qc_filtering.R          /app/
+    part3_integration_clustering.R /app/
+    part4_cell_annotation.R       /app/
+    part5_differential_expression.R /app/
+    part6_object_exploration.R    /app/
+    part7_trajectory_analysis.R   /app/
+    part8_pdx_processing.R        /app/
+    part9_cellchat.R              /app/
+    part10_nichenet.R             /app/
+    run_pipeline.sh               /app/
+
+%environment
+    export FLASK_ENV=production
+    export LC_ALL=C.UTF-8
+    export LANG=C.UTF-8
+
+%runscript
+    echo "🔬 scRATool — Starting web interface on port 5000..."
+    cd /app/webapp
+    exec python3 app.py 5000

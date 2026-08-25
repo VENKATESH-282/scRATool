@@ -42,7 +42,7 @@
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/scRATool.git
+git clone https://github.com/VENKATESH-282/scRATool.git
 cd scRATool
 ```
 
@@ -245,15 +245,111 @@ The pipeline will download supplementary files, detect the matrix format (MEX/H5
 
 ## Docker
 
+The easiest way to run scRATool — no need to install R, Python, or Nextflow manually.
+
+### Quick Start (Docker Compose)
+
+```bash
+# Clone the repo
+git clone https://github.com/VENKATESH-282/scRATool.git
+cd scRATool
+
+# Build and launch (first build takes 30-60 min for R packages)
+docker-compose up -d
+
+# Open the web UI
+open http://localhost:5000
+```
+
+### Quick Start (Docker CLI)
+
 ```bash
 # Build the image
 docker build -t scratool .
 
-# Run with Docker Compose
-docker-compose up -d
+# Run with results volume mounted
+docker run -d \
+  --name scratool \
+  -p 5000:5000 \
+  -v $(pwd)/results:/app/nextflow/results \
+  -v $(pwd)/uploads:/app/webapp/uploads \
+  scratool
 
-# Access the web UI
+# Open the web UI
 open http://localhost:5000
+
+# View logs
+docker logs -f scratool
+
+# Stop
+docker stop scratool
+```
+
+### Running the Pipeline Inside Docker (CLI)
+
+```bash
+# Run directly inside the container without the web UI
+docker run --rm -it \
+  -v $(pwd)/my_data:/data \
+  -v $(pwd)/results:/app/nextflow/results \
+  scratool \
+  bash -c "cd /app/nextflow && nextflow run main.nf --matrix /data/samples.csv --outdir results -profile local"
+```
+
+---
+
+## Singularity (for HPC)
+
+Singularity is the standard container runtime on HPC clusters where Docker is not available.
+
+### Build from the Definition File
+
+```bash
+# Build the .sif image (requires root or --fakeroot)
+sudo singularity build scratool.sif Singularity.def
+```
+
+### Build from Docker Hub (if published)
+
+```bash
+singularity pull scratool.sif docker://venkatesh282/scratool:latest
+```
+
+### Run the Web GUI
+
+```bash
+# Launch the web interface (bind your data directory)
+singularity run --bind /data:/data scratool.sif
+
+# Access at http://localhost:5000
+```
+
+### Run the Pipeline (CLI on HPC)
+
+```bash
+# Execute the pipeline directly
+singularity exec --bind /scratch:/scratch,/data:/data scratool.sif \
+  bash -c "cd /app/nextflow && nextflow run main.nf \
+    --matrix /data/samples.csv \
+    --outdir /scratch/my_results \
+    -profile local \
+    --skip_cellranger --skip_pdx"
+```
+
+### Submit as a SLURM Job
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=scratool
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=128G
+#SBATCH --time=24:00:00
+
+singularity exec --bind /data:/data,/scratch:/scratch scratool.sif \
+  bash -c "cd /app/nextflow && nextflow run main.nf \
+    --matrix /data/samples.csv \
+    --outdir /scratch/results \
+    -profile local"
 ```
 
 ---
@@ -271,5 +367,5 @@ If you use scRATool in your research, please cite:
 ```
 scRATool: Single-Cell RNA-seq Analysis Tool
 Tata Institute for Genetics and Society
-https://github.com/YOUR_USERNAME/scRATool
+https://github.com/VENKATESH-282/scRATool
 ```

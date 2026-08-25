@@ -1,0 +1,39 @@
+# Ignore results, work dirs, and logs
+nextflow/results*/
+nextflow/small_geo/
+nextflow/work/
+nextflow/.nextflow/
+nextflow/.nextflow.log*
+nextflow/.server_password
+nextflow/.server_config.json
+nextflow/.current_csv
+nextflow/host_watcher.log
+nextflow/ui_pass.txt
+nextflow/ui_cmd.txt
+nextflow/ui_outdir.txt
+
+# Ignore webapp runtime files
+webapp/venv/
+webapp/__pycache__/
+webapp/sessions/
+webapp/uploads/
+webapp/webapp.log
+
+# Ignore build artifacts
+*.zip
+*.tar.gz
+*.pyc
+__pycache__/
+
+# Ignore OS files
+.DS_Store
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Ignore docs and non-essential files
+docs/
+*.md
+!README.md
+Singularity.def
