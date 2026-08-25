@@ -356,7 +356,8 @@ singularity exec --bind /data:/data,/scratch:/scratch scratool.sif \
 
 ## License
 
-This project is developed by the **Tata Institute for Genetics and Society (TIGS)**.
+This project is licensed under the [MIT License](LICENSE). 
+Developed by the **Tata Institute for Genetics and Society (TIGS)**.
 
 ---
 
