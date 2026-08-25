@@ -1,5 +1,5 @@
 # =============================================================================
-# Pipeline Configuration for HPC Cluster (tigshp)
+# Pipeline Configuration for HPC Cluster
 # =============================================================================
 
 # Project Base Directory
