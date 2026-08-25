@@ -265,24 +265,24 @@ open http://localhost:5000
 
 ```bash
 # Build the image
-docker build -t scratool .
+docker build -t venkatbioinfo/v-scrna-seq-pipeline .
 
 # Run with results volume mounted
 docker run -d \
-  --name scratool \
+  --name v-scrna-seq-pipeline \
   -p 5000:5000 \
   -v $(pwd)/results:/app/nextflow/results \
   -v $(pwd)/uploads:/app/webapp/uploads \
-  scratool
+  venkatbioinfo/v-scrna-seq-pipeline
 
 # Open the web UI
 open http://localhost:5000
 
 # View logs
-docker logs -f scratool
+docker logs -f v-scrna-seq-pipeline
 
 # Stop
-docker stop scratool
+docker stop v-scrna-seq-pipeline
 ```
 
 ### Running the Pipeline Inside Docker (CLI)
@@ -292,7 +292,7 @@ docker stop scratool
 docker run --rm -it \
   -v $(pwd)/my_data:/data \
   -v $(pwd)/results:/app/nextflow/results \
-  scratool \
+  venkatbioinfo/v-scrna-seq-pipeline \
   bash -c "cd /app/nextflow && nextflow run main.nf --matrix /data/samples.csv --outdir results -profile local"
 ```
 
@@ -312,7 +312,7 @@ sudo singularity build scratool.sif Singularity.def
 ### Build from Docker Hub (if published)
 
 ```bash
-singularity pull scratool.sif docker://venkatesh282/scratool:latest
+singularity pull scratool.sif docker://venkatbioinfo/v-scrna-seq-pipeline:latest
 ```
 
 ### Run the Web GUI

@@ -1,11 +1,12 @@
 version: "3.8"
 
 services:
-  scratool:
+  v-scrna-seq-pipeline:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: scratool
+    image: venkatbioinfo/v-scrna-seq-pipeline:latest
+    container_name: v-scrna-seq-pipeline
     ports:
       - "5000:5000"
     volumes:
