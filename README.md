@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">🔬 scRATool</h1>
+  <h1 align="center"> scRATool</h1>
   <p align="center"><strong>Single-Cell RNA-seq Analysis Tool</strong></p>
   <p align="center">
     An end-to-end Nextflow + Flask pipeline for scRNA-seq data analysis — from raw FASTQs or count matrices to publication-ready figures.
