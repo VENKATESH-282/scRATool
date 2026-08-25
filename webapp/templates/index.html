@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>scRATool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<!-- Global Page Loader with Animated Video -->
+<div id="pageLoader" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-primary, #ffffff); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease;">
+  <video src="/static/img/loading_animation.mp4" autoplay loop muted playsinline style="width: 250px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);"></video>
+  <h2 style="margin-top: 2rem; color: var(--text-primary); font-weight: 500; font-family: 'Inter', sans-serif;">scRNA Studio Loading...</h2>
+</div>
+<script>
+  window.addEventListener('load', () => {
+    const loader = document.getElementById('pageLoader');
+    setTimeout(() => {
+      loader.style.opacity = '0';
+      setTimeout(() => loader.style.display = 'none', 500);
+    }, 1500); // Play video for a short moment
+  });
+</script>
+<!-- ══════════════════ TOP NAVBAR ══════════════════ -->
+<nav class="top-navbar" id="topNavbar">
+  <div class="navbar-left">
+    <div class="nav-brand">scRATool</div>
+    <div class="nav-links">
+      <a class="nav-item active" data-tab="data" href="#">Data</a>
+      
+      <div class="nav-dropdown">
+        <button class="dropdown-btn">Preprocessing ▾</button>
+        <div class="dropdown-content">
+          <a class="nav-item" data-tab="qc" href="#">Quality Control</a>
+          <a class="nav-item" data-tab="normalization" href="#">Normalization &amp; Integration</a>
+          <a class="nav-item" data-tab="dimred" href="#">Dimensionality Reduction</a>
+          <a class="nav-item" data-tab="clustering" href="#">Clustering</a>
+        </div>
+      </div>
+
+      <div class="nav-dropdown">
+        <button class="dropdown-btn">Downstream ▾</button>
+        <div class="dropdown-content">
+          <a class="nav-item" data-tab="annotation" href="#">Cell Annotation</a>
+          <a class="nav-item" data-tab="de" href="#">Differential Expression</a>
+          <a class="nav-item" data-tab="enrichment" href="#">Functional Enrichment</a>
+          <a class="nav-item" data-tab="featureplots" href="#">Feature Plots</a>
+          <a class="nav-item" data-tab="trajectory" href="#">Trajectory</a>
+        </div>
+      </div>
+
+      <div class="nav-dropdown">
+        <button class="dropdown-btn">Advanced ▾</button>
+        <div class="dropdown-content">
+          <a class="nav-item" data-tab="cellchat" href="#">Cell Communication</a>
+          <a class="nav-item" data-tab="nichenet" href="#">NicheNet</a>
+          <a class="nav-item" data-tab="copykat" href="#">CNV (CopyKAT)</a>
+        </div>
+      </div>
+
+      <div class="nav-dropdown">
+        <button class="dropdown-btn">Tools ▾</button>
+        <div class="dropdown-content">
+          <a class="nav-item" data-tab="settings" href="#">Settings</a>
+          <a class="nav-item" data-tab="report" href="#">Report</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="navbar-right">
+    <div class="pipeline-status-bar" style="margin-right: 10px;">
+      <select id="activeRunDropdown" class="select-input" style="height: 28px; padding: 0 10px; font-size: 0.8rem; background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary);">
+        <option value="results">results (Default)</option>
+      </select>
+    </div>
+    <div class="pipeline-status-bar">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Idle</span>
+    </div>
+    <div class="session-box">
+      <span class="session-label">Session token:</span>
+      <span class="session-token" id="sessionToken">–––––</span>
+      <div class="session-actions">
+        <button class="btn-ghost" id="btnNewSession" title="New session">New</button>
+        <button class="btn-ghost" id="btnSaveSession" title="Save session">Save</button>
+        <button class="btn-ghost" id="btnLoadSession" title="Load session">Load</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════ MAIN CONTENT ══════════════════ -->
+<main class="main-content">
+
+  <!-- ─── TAB: DATA ──────────────────────────────── -->
+  <section class="tab-panel active" id="tab-data">
+    <div class="panel-header">
+      <h1>Data &amp; Pipeline Setup</h1>
+      <p class="panel-desc">Configure your input data and launch the scRNA-seq pipeline. Choose your input mode, select a sample sheet, and set compute resources.</p>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>Input Mode</h3>
+        <div class="radio-group" id="modeGroup">
+          <label class="radio-card selected">
+            <input type="radio" name="mode" value="matrix" checked>
+            <span class="radio-title">10X Count Matrices</span>
+            <span class="radio-desc">Start from MEX directories (skip CellRanger)</span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="mode" value="input">
+            <span class="radio-title">Raw FASTQs</span>
+            <span class="radio-desc">Full pipeline from raw reads via CellRanger</span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="mode" value="seurat_rds">
+            <span class="radio-title">Seurat RDS</span>
+            <span class="radio-desc">Start from a pre-merged Seurat object</span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="mode" value="geo">
+            <span class="radio-title">GEO Accession</span>
+            <span class="radio-desc">Download dataset from NCBI GEO query</span>
+          </label>
+        </div>
+
+        <div id="geoInputSection" style="display:none; margin-top:1.5rem">
+          <h3>NCBI GEO Accession ID</h3>
+          <div class="form-row" style="margin-bottom:0.75rem">
+            <input type="text" id="geoIdInput" class="select-input" placeholder="e.g. GSE171524 or GSE174609" style="flex:1">
+          </div>
+          <span class="form-hint" style="margin-bottom:0.75rem; display:block; color: var(--text-muted); font-size:0.78rem">
+            Fetches supplementary files from NCBI FTP, auto-extracts archives, detects matrix format (MEX/H5/DGE), and generates a sample sheet.
+          </span>
+          <div style="background:var(--bg-card-hover); border:1px solid var(--border); border-radius:8px; padding:1rem; margin-bottom:1rem">
+            <div style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.6rem; font-weight:600">SKIP OPTIONS (for end-to-end run)</div>
+            <div class="checkbox-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem">
+              <label><input type="checkbox" id="geo_skipCellranger" checked> Skip CellRanger</label>
+              <label><input type="checkbox" id="geo_skipPdx" checked> Skip PDX</label>
+              <label><input type="checkbox" id="geo_skipQc"> Skip QC</label>
+              <label><input type="checkbox" id="geo_skipIntegration"> Skip Integration</label>
+              <label><input type="checkbox" id="geo_skipAnnotation"> Skip Annotation</label>
+              <label><input type="checkbox" id="geo_skipDe"> Skip DE</label>
+              <label><input type="checkbox" id="geo_skipTrajectory"> Skip Trajectory</label>
+              <label><input type="checkbox" id="geo_skipCellchat" checked> Skip CellChat</label>
+              <label><input type="checkbox" id="geo_skipNichenet" checked> Skip NicheNet</label>
+              <label><input type="checkbox" id="geo_skipCopykat" checked> Skip CopyKAT</label>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-ghost" id="btnGeoDownload">Download Only</button>
+            <button class="btn-primary" id="btnGeoDownloadRun">Download + Run End-to-End</button>
+          </div>
+          <div id="geoStatus" style="margin-top:0.5rem; font-size:0.78rem; color:var(--text-muted)"></div>
+        </div>
+
+
+        <h3 style="margin-top:1.5rem">Sample Sheet</h3>
+        <div class="form-row">
+          <select id="sampleCsvSelect" class="select-input">
+            <option value="">— Loading available CSVs —</option>
+          </select>
+          <span class="form-hint">or</span>
+          <label class="btn-upload">
+            <input type="file" id="uploadCsvInput" accept=".csv" hidden>
+            Upload CSV
+          </label>
+        </div>
+        <div id="samplePreview" class="table-wrap" style="display:none"></div>
+
+        <h3 style="margin-top:1.5rem">Output Folder Name</h3>
+        <input type="text" id="outdirName" class="select-input" placeholder="e.g. results_sampleA (defaults to 'results')" style="width:100%; margin-bottom:0.75rem">
+
+        <h3 style="margin-top:1.5rem">Compute Profile</h3>
+        <select id="profileSelect" class="select-input">
+          <option value="local">local — Workstation (32 CPU / 64 GB)</option>
+          <option value="laptop">laptop — Low resources (8 CPU / 16 GB)</option>
+          <option value="server">server — High-memory server (128 CPU / 250 GB)</option>
+          <option value="hpc_small">hpc_small — SLURM small partition</option>
+          <option value="hpc_large">hpc_large — SLURM high-mem partition</option>
+          <option value="docker">docker — Docker container</option>
+        </select>
+
+        <h3 style="margin-top:1.5rem">Skip Flags</h3>
+        <div class="checkbox-group" id="skipFlags">
+          <label><input type="checkbox" id="skipCellranger"> Skip CellRanger</label>
+          <label><input type="checkbox" id="skipPdx" checked> Skip PDX processing</label>
+          <label><input type="checkbox" id="skipQc"> Skip QC</label>
+          <label><input type="checkbox" id="skipIntegration"> Skip Integration</label>
+          <label><input type="checkbox" id="skipAnnotation"> Skip Annotation</label>
+          <label><input type="checkbox" id="skipDe"> Skip DE</label>
+          <label><input type="checkbox" id="skipTrajectory"> Skip Trajectory</label>
+          <label><input type="checkbox" id="skipCellchat"> Skip CellChat</label>
+          <label><input type="checkbox" id="skipNichenet"> Skip NicheNet</label>
+          <label><input type="checkbox" id="skipCopykat" checked> Skip CopyKAT</label>
+        </div>
+
+        <div class="btn-row" style="margin-top:2rem">
+          <button class="btn-primary" id="btnLaunch">Launch Pipeline</button>
+          <button class="btn-danger"  id="btnStop" disabled>Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Pipeline Log <span class="badge" id="logBadge">0</span></h3>
+        <div class="log-terminal" id="logTerminal">
+          <span class="log-placeholder">Pipeline output will stream here...</span>
+        </div>
+        <div class="progress-steps" id="progressSteps"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TAB: QC ──────────────────────────────────── -->
+  <section class="tab-panel" id="tab-qc">
+    <div class="panel-header">
+      <h1>Quality Control</h1>
+      <p class="panel-desc">Per-sample QC plots from EmptyDrops, SoupX ambient RNA correction, doublet detection, cell/gene filtering, and normalization.</p>
+    </div>
+    <div class="info-strip">
+      <div class="info-item"><span class="info-label">Steps</span><span class="info-val">EmptyDrops → SoupX → scDblFinder → Cell Filter → Gene Filter → Normalize</span></div>
+    </div>
+    <div id="qcContent">
+      <div class="plots-toolbar">
+        <select id="qcSampleDropdown" class="select-input" style="max-width:300px;">
+          <option value="">All Samples</option>
+        </select>
+        <button class="btn-ghost" id="qcRefresh">Refresh</button>
+      </div>
+      <div class="plot-grid" id="qcPlotGrid"><div class="empty-state">Run the pipeline to see QC plots here.</div></div>
+      <div class="table-section">
+        <h3>QC Summary Table</h3>
+        <div id="qcTable" class="table-wrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TAB: NORMALIZATION ──────────────────────── -->
+  <section class="tab-panel" id="tab-normalization">
+    <div class="panel-header">
+      <h1>Normalization &amp; Batch Correction</h1>
+      <p class="panel-desc">Integration results comparing CCA, RPCA, Harmony, and FastMNN. Side-by-side UMAP comparison and mixing scores.</p>
+    </div>
+    <div class="info-strip">
+      <div class="info-item"><span class="info-label">Methods</span><span class="info-val">Naive PCA · CCA · RPCA · Harmony · FastMNN</span></div>
+    </div>
+    <div class="plots-toolbar">
+      <button class="btn-ghost" id="normRefresh">Refresh</button>
+    </div>
+    <div class="plot-grid" id="normPlotGrid"><div class="empty-state">Run Part 3 (Integration &amp; Clustering) to see results.</div></div>
+  </section>
+
+  <!-- ─── TAB: DIMRED ──────────────────────────────── -->
+  <section class="tab-panel" id="tab-dimred">
+    <div class="panel-header">
+      <h1>Dimensionality Reduction</h1>
+      <p class="panel-desc">PCA elbow plots, UMAP, and highly variable gene selection from the integration step.</p>
+    </div>
+    <div class="plot-grid" id="dimredPlotGrid"><div class="empty-state">Run Part 3 to see dimensionality reduction plots.</div></div>
+  </section>
+
+  <!-- ─── TAB: CLUSTERING ──────────────────────────── -->
+  <section class="tab-panel" id="tab-clustering">
+    <div class="panel-header">
+      <h1>Clustering Analysis</h1>
+      <p class="panel-desc">Cluster UMAPs, silhouette scores, and marker gene identification across resolution sweeps.</p>
+    </div>
+    <div class="plots-toolbar">
+      <button class="btn-ghost" id="clusterRefresh">Refresh</button>
+    </div>
+    <div class="plot-grid" id="clusterPlotGrid"><div class="empty-state">Run Part 3 (Integration &amp; Clustering) to see clustering results.</div></div>
+    <div class="table-section">
+      <h3>Cluster Markers</h3>
+      <div id="clusterTable" class="table-wrap"></div>
+    </div>
+  </section>
+
+  <!-- ─── TAB: ANNOTATION ──────────────────────────── -->
+  <section class="tab-panel" id="tab-annotation">
+    <div class="panel-header">
+      <h1>Cell Type Annotation</h1>
+      <p class="panel-desc">Automatic cell type labeling using SingleR/scType reference databases, plus manual annotation UMAPs.</p>
+    </div>
+    <div class="plots-toolbar">
+      <button class="btn-ghost" id="annotRefresh">Refresh</button>
+    </div>
+    <div class="plot-grid" id="annotPlotGrid"><div class="empty-state">Run Part 4 (Cell Annotation) to see annotation results.</div></div>
+  </section>
+
+  <!-- ─── TAB: DE ──────────────────────────────────── -->
+  <section class="tab-panel" id="tab-de">
+    <div class="panel-header">
+      <h1>Differential Expression</h1>
+      <p class="panel-desc">Pseudobulk differential expression between conditions. Volcano plots, heatmaps, and ranked DE tables.</p>
+    </div>
+    <div class="plots-toolbar">
+      <button class="btn-ghost" id="deRefresh">Refresh</button>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="plot-grid single" id="dePlotGrid"><div class="empty-state">Run Part 5 (DE Analysis) to see plots.</div></div>
+      </div>
+      <div class="card">
+        <h3>DE Results Table</h3>
+        <input type="text" id="deSearch" class="search-input" placeholder="Search gene...">
+        <div id="deTable" class="table-wrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TAB: ENRICHMENT ──────────────────────────── -->
+  <section class="tab-panel" id="tab-enrichment">
+    <div class="panel-header">
+      <h1>Functional Enrichment Analysis</h1>
+      <p class="panel-desc">Gene Set Enrichment Analysis (GSEA) using MSigDB collections. Gene set scoring and pathway heatmaps.</p>
+    </div>
+    <div class="card" style="margin-bottom:1rem">
+      <h3>Run Enrichment Analysis</h3>
+      <div class="form-row">
+        <select id="enrichCollection" class="select-input">
+          <option value="H">H — Hallmark Gene Sets</option>
+          <option value="C2">C2 — Curated Gene Sets (KEGG/Reactome)</option>
+          <option value="C5">C5 — GO Gene Sets</option>
+          <option value="C6">C6 — Oncogenic Signatures</option>
+          <option value="C7">C7 — Immunologic Signatures</option>
+        </select>
+        <select id="enrichOrganism" class="select-input">
+          <option value="Homo sapiens">Human (Homo sapiens)</option>
+          <option value="Mus musculus">Mouse (Mus musculus)</option>
+        </select>
+        <button class="btn-primary" id="btnRunEnrichment">Run GSEA</button>
+      </div>
+      <div id="enrichStatus" class="status-msg"></div>
+    </div>
+    <div class="plots-toolbar">
+      <button class="btn-ghost" id="enrichRefresh">Refresh</button>
+    </div>
+    <div class="plot-grid" id="enrichPlotGrid"><div class="empty-state">Run enrichment analysis or Part 12 to see results.</div></div>
+    <div class="table-section">
+      <h3>Enrichment Results</h3>
+      <div id="enrichTable" class="table-wrap"></div>
+    </div>
+  </section>
+
+  <!-- ─── TAB: FEATURE PLOTS ──────────────────────── -->
+  <section class="tab-panel" id="tab-featureplots">
+    <div class="panel-header">
+      <h1>Feature Plots</h1>
+      <p class="panel-desc">Gene expression UMAPs, violin plots, and dot plots from the object exploration step.</p>
+    </div>
+    <div class="plots-toolbar">
+      <button class="btn-ghost" id="featRefresh">Refresh</button>
+    </div>
+    <div class="plot-grid" id="featPlotGrid"><div class="empty-state">Run Part 6 (Object Exploration) to see feature plots.</div></div>
+  </section>
+
+  <!-- ─── TAB: TRAJECTORY ─────────────────────────── -->
+  <section class="tab-panel" id="tab-trajectory">
+    <div class="panel-header">
+      <h1>Trajectory Analysis</h1>
+      <p class="panel-desc">Pseudotime trajectories computed with Slingshot. Lineage paths overlaid on UMAP, gene dynamics along pseudotime.</p>
+    </div>
+    <div class="plots-toolbar">
+      <button class="btn-ghost" id="trajRefresh">Refresh</button>
+    </div>
+    <div class="plot-grid" id="trajPlotGrid"><div class="empty-state">Run Part 7 (Trajectory Analysis) to see results.</div></div>
+  </section>
+
+  <!-- ─── TAB: CELLCHAT ───────────────────────────── -->
+  <section class="tab-panel" id="tab-cellchat">
+    <div class="panel-header">
+      <h1>Cell-Cell Communication (CellChat)</h1>
+      <p class="panel-desc">Ligand-receptor interaction networks between cell types. Chord diagrams, bubble plots, and communication probability heatmaps.</p>
+    </div>
+    <div class="plots-toolbar">
+      <button class="btn-ghost" id="cellchatRefresh">Refresh</button>
+    </div>
+    <div class="plot-grid" id="cellchatPlotGrid"><div class="empty-state">Run Part 9 (CellChat) to see cell communication results.</div></div>
+  </section>
+
+  <!-- ─── TAB: NICHENET ───────────────────────────── -->
+  <section class="tab-panel" id="tab-nichenet">
+    <div class="panel-header">
+      <h1>NicheNet Ligand Activity</h1>
+      <p class="panel-desc">Prioritized ligands from sender cells, target gene heatmaps, and ligand-receptor co-expression plots.</p>
+    </div>
+    <div class="plots-toolbar">
+      <button class="btn-ghost" id="nichenetRefresh">Refresh</button>
+    </div>
+    <div class="plot-grid" id="nichenetPlotGrid"><div class="empty-state">Run Part 10 (NicheNet) to see results.</div></div>
+  </section>
+
+  <!-- ─── TAB: COPYKAT ────────────────────────────── -->
+  <section class="tab-panel" id="tab-copykat">
+    <div class="panel-header">
+      <h1>CNV Analysis (CopyKAT)</h1>
+      <p class="panel-desc">Copy number variation inference from scRNA-seq. Tumor vs. normal cell classification, CNV heatmaps.</p>
+    </div>
+    <div class="plots-toolbar">
+      <button class="btn-ghost" id="copykatRefresh">Refresh</button>
+    </div>
+    <div class="plot-grid" id="copykatPlotGrid"><div class="empty-state">Run Part 11 (CopyKAT) to see CNV results.</div></div>
+  </section>
+
+  <!-- ─── TAB: SETTINGS ───────────────────────────── -->
+  <section class="tab-panel" id="tab-settings">
+    <div class="panel-header">
+      <h1>Settings</h1>
+      <p class="panel-desc">Customize cell type colors, edit metadata annotations, and subset cell populations for focused analysis.</p>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>Custom Color Assignments</h3>
+        <p class="card-desc">Assign consistent colors to cell groups for publication-ready figures.</p>
+        <div id="colorAssignments">
+          <div class="color-row">
+            <input type="text" class="color-label-input" placeholder="Cell type name (e.g. T cells)">
+            <input type="color" class="color-picker" value="#7c3aed">
+            <button class="btn-ghost remove-color">Remove</button>
+          </div>
+        </div>
+        <button class="btn-ghost" id="addColorRow" style="margin-top:0.75rem">Add color</button>
+        <button class="btn-primary" id="saveColors" style="margin-top:0.75rem">Save Colors</button>
+      </div>
+      <div class="card">
+        <h3>Metadata Editing</h3>
+        <p class="card-desc">Create new annotation variables or rename existing metadata fields.</p>
+        <div class="form-row" style="flex-direction:column;gap:0.75rem">
+          <input type="text" class="select-input" id="newMetaField" placeholder="New field name (e.g. cell_state)">
+          <textarea class="select-input" id="newMetaValues" placeholder="Values (one per line or comma-separated)" rows="4" style="resize:vertical"></textarea>
+          <button class="btn-primary" id="addMetaField">Add Metadata Field</button>
+        </div>
+        <div id="settingsStatus" class="status-msg"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h3>Subset Cells</h3>
+      <p class="card-desc">Create a new focused session from a subset of your cells.</p>
+      <div class="form-row">
+        <select id="subsetField" class="select-input"><option>— select metadata field —</option></select>
+        <select id="subsetValue" class="select-input"><option>— select value —</option></select>
+        <button class="btn-primary" id="btnSubset">Create Subset Session</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1rem">
+      <h3>🖥 Server Connection</h3>
+      <p class="card-desc">Configure your remote server for <code>server</code> / <code>hpc_small</code> / <code>hpc_large</code> profiles. Settings are saved locally. Password is never stored in plain-text long-term — it is written to a temp file, used once, then deleted by <code>ssh_wrapper.py</code>.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.75rem">
+        <div>
+          <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:0.3rem">Server Host / IP</label>
+          <input type="text" class="select-input" id="serverHost" placeholder="e.g. 192.168.1.100">
+        </div>
+        <div>
+          <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:0.3rem">SSH Username</label>
+          <input type="text" class="select-input" id="serverUser" placeholder="e.g. ngs">
+        </div>
+        <div>
+          <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:0.3rem">Remote Pipeline Directory</label>
+          <input type="text" class="select-input" id="serverDir" placeholder="e.g. /data/user/scrna/pipeline">
+        </div>
+        <div>
+          <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:0.3rem">SSH Key Path (optional)</label>
+          <input type="text" class="select-input" id="serverSshKey" placeholder="e.g. ~/.ssh/id_rsa (leave blank for password)">
+        </div>
+      </div>
+      <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; margin-bottom:0.75rem">
+        <input type="password" class="select-input" id="serverPasswordInput"
+               placeholder="SSH Password (saved to .server_password, chmod 600)" style="flex:1; min-width:200px">
+        <button class="btn-primary" id="btnSaveServerConfig">Save Config &amp; Password</button>
+        <button class="btn-ghost" id="btnTestServerConnection">Test Connection</button>
+        <button class="btn-ghost" id="btnClearServerPassword" style="color:#ef4444">Clear Password</button>
+      </div>
+      <div id="serverPasswordStatus" style="font-size:0.78rem; color:var(--text-muted)">Loading...</div>
+    </div>
+
+    <div class="card" style="margin-top:1rem">
+      <h3>📁 Results Export</h3>
+      <p class="card-desc">By default, the pipeline saves all results and plots to the internal <code>results/</code> directory so they can be viewed in the UI tabs. You can optionally specify a custom external path to copy the final results to after the run finishes.</p>
+      <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap">
+        <input type="text" class="select-input" id="exportDir" placeholder="e.g. /home/user/Downloads/scRNA_Results" style="flex:1; min-width:300px">
+        <button class="btn-primary" id="btnSaveExportDir">Save Export Path</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TAB: REPORT ─────────────────────────────── -->
+  <section class="tab-panel" id="tab-report">
+    <div class="panel-header">
+      <h1>Analysis Report</h1>
+      <p class="panel-desc">Auto-generated HTML report documenting all completed pipeline steps, parameters used, and output figures.</p>
+    </div>
+    <div class="card">
+      <h3>Generate Report</h3>
+      <p class="card-desc">The report will include all plots from completed pipeline steps, sample statistics, and the parameters used at each step.</p>
+      <div class="btn-row">
+        <button class="btn-primary" id="btnGenerateReport">Generate HTML Report</button>
+        <button class="btn-ghost" id="btnDownloadReport">Download Report</button>
+      </div>
+      <div id="reportStatus" class="status-msg" style="margin-top:1rem"></div>
+    </div>
+    <div id="reportPreview" class="report-preview-frame"></div>
+  </section>
+
+</main>
+
+<!-- ══════════════════ MODALS ══════════════════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <span id="modalTitle">Modal</span>
+      <button class="modal-close" id="modalClose">Close</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- Lightbox for enlarged plots -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">Close</button>
+  <img id="lightboxImg" src="" alt="Plot">
+</div>
+
+<script src="/static/js/session.js"></script>
+<script src="/static/js/plots.js"></script>
+<script src="/static/js/app.js"></script>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer class="footer">
+  <span class="footer-text">Developed by Tata Institute for Genetics and Society</span>
+</footer>
+
+</body>
+</html>

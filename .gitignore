@@ -1,0 +1,38 @@
+# ── Python / Flask ──
+webapp/venv/
+webapp/__pycache__/
+webapp/sessions/
+webapp/uploads/
+webapp/webapp.log
+*.pyc
+__pycache__/
+
+# ── Nextflow ──
+nextflow/.nextflow/
+nextflow/.nextflow.log*
+nextflow/work/
+nextflow/results*/
+nextflow/small_geo/
+nextflow/.current_csv
+nextflow/host_watcher.log
+
+# ── Credentials (NEVER commit these) ──
+nextflow/.server_password
+nextflow/.server_config.json
+nextflow/ui_pass.txt
+nextflow/ui_cmd.txt
+nextflow/ui_outdir.txt
+
+# ── OS / IDE ──
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ── Archives & temp files ──
+*.zip
+*.tar.gz
+*.bak
+*.log
+sync_*.py
+remote_grep.py

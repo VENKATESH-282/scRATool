@@ -1,0 +1,5 @@
+sample_id,matrix_dir,condition,patient_id
+SampleA,/path/to/SampleA/outs/filtered_feature_bc_matrix,Control,Patient1
+SampleB,/path/to/SampleB/outs/filtered_feature_bc_matrix,Control,Patient2
+SampleC,/path/to/SampleC/outs/filtered_feature_bc_matrix,Treatment,Patient3
+SampleD,/path/to/SampleD/outs/filtered_feature_bc_matrix,Treatment,Patient4

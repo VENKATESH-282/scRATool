@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  sc-rna-studio:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: scrna-studio
+    ports:
+      - "5000:5000"
+    volumes:
+      # Mount the sessions, uploads, and Nextflow configs to ensure persistence across restarts
+      - ./webapp/sessions:/app/webapp/sessions
+      - ./webapp/uploads:/app/webapp/uploads
+      - ./nextflow/.server_config.json:/app/nextflow/.server_config.json
+    environment:
+      - FLASK_ENV=production
+    restart: unless-stopped
