@@ -103,7 +103,7 @@ From: bioconductor/bioconductor_docker:RELEASE_3_19
     R -e "install.packages('HGNChelper', repos='https://cloud.r-project.org')"
 
     # ── Python / Flask ───────────────────────────────────────────────────────
-    pip3 install --no-cache-dir --break-system-packages \
+    pip3 install --no-cache-dir \
         flask>=3.0.0 flask-cors>=4.0.0 werkzeug>=3.0.0 \
         psutil>=5.9.0 pandas>=2.0.0 plotly>=5.18.0 \
         kaleido>=0.2.1 pexpect>=4.8.0 requests>=2.31.0 GEOparse>=2.0.3

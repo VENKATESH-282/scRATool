@@ -102,7 +102,7 @@ RUN R -e "install.packages('HGNChelper', repos='https://cloud.r-project.org')"
 WORKDIR /app
 
 COPY webapp/requirements.txt ./webapp/requirements.txt
-RUN pip3 install --no-cache-dir --break-system-packages -r webapp/requirements.txt
+RUN pip3 install --no-cache-dir -r webapp/requirements.txt
 
 # ── 4. Nextflow ──────────────────────────────────────────────────────────────
 RUN curl -s https://get.nextflow.io | bash && \
