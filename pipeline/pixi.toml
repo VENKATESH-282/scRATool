@@ -1,0 +1,98 @@
+[workspace]
+channels = ["conda-forge", "bioconda", "pwwang"]
+name = "scrna-downstream-nf"
+platforms = ["linux-64"]
+version = "1.0.0"
+
+[tasks]
+install-github = "Rscript assets/setup_github_pkgs.R"
+verify = "Rscript assets/verify_env.R"
+run-local = "bash run_local.sh"
+run-cluster = "bash run_cluster.sh"
+
+[dependencies]
+r-base = "4.3.*"
+compilers = ">=2.0.0,<3"
+nextflow = ">=23.10.0"
+python = ">=3.10"
+
+# Core Single-Cell and Seurat Ecosystem
+r-seurat = ">=5.0.0"
+r-seuratobject = ">=5.0.0"
+r-sp = ">=2.0"
+r-harmony = ">=1.2.0"
+r-fnn = ">=1.1.4"
+r-cluster = ">=2.1.0"
+r-future = ">=1.33.0"
+"r-future.apply" = ">=1.11.0"
+
+# Bioconductor Core Single-Cell
+bioconductor-singlecellexperiment = ">=1.24.0"
+bioconductor-summarizedexperiment = ">=1.32.0"
+bioconductor-s4vectors = ">=0.40.0"
+bioconductor-dropletutils = ">=1.22.0"
+bioconductor-batchelor = ">=1.18.0"
+bioconductor-scdblfinder = ">=1.16.0"
+bioconductor-decontx = ">=1.0.0"
+
+# Annotation & Databases
+bioconductor-singler = ">=2.4.0"
+bioconductor-celldex = ">=1.12.0"
+"bioconductor-org.hs.eg.db" = ">=3.18.0"
+"bioconductor-genomeinfodbdata" = "*"
+bioconductor-annotationdbi = ">=1.64.0"
+r-hgnchelper = ">=0.8.15"
+
+# Differential Expression & Pseudobulk
+bioconductor-deseq2 = ">=1.42.0"
+bioconductor-edger = ">=4.0.0"
+bioconductor-limma = ">=3.58.0"
+bioconductor-apeglm = ">=1.24.0"
+bioconductor-speckle = ">=1.2.0"
+bioconductor-fgsea = ">=1.28.0"
+bioconductor-enhancedvolcano = ">=1.20.0"
+r-msigdbr = ">=7.5.1"
+
+# Trajectory & Pseudotime
+bioconductor-slingshot = ">=2.10.0"
+bioconductor-trajectoryutils = ">=1.10.0"
+r-princurve = ">=2.1.6"
+
+# Networks & Co-expression
+r-wgcna = ">=1.72"
+bioconductor-ucell = ">=2.6.0"
+bioconductor-geneoverlap = ">=1.38.0"
+r-enrichr = ">=3.2"
+
+# Cell-Cell Communication & Graphics
+bioconductor-complexheatmap = ">=2.18.0"
+bioconductor-biocneighbors = ">=1.20.0"
+r-circlize = ">=0.4.15"
+r-nmf = ">=0.21.0"
+r-foreach = ">=1.5.2"
+r-reticulate = ">=1.35.0"
+r-igraph = ">=2.0.0"
+r-ggraph = ">=2.2.0"
+
+# CNV Analysis
+r-gplots = ">=3.1.3"
+r-paralleldist = ">=0.2.6"
+
+# General Utilities & Plotting
+r-dplyr = ">=1.1.4"
+r-tidyr = ">=1.3.1"
+r-ggplot2 = ">=3.5.0"
+r-patchwork = ">=1.2.0"
+r-ggrepel = ">=0.9.5"
+r-rcolorbrewer = ">=1.1"
+r-viridis = ">=0.6.5"
+r-ggridges = ">=0.5.6"
+r-pheatmap = ">=1.0.12"
+r-reshape2 = ">=1.4.4"
+r-cowplot = ">=1.1.3"
+r-openxlsx = ">=4.2.5"
+r-ggalluvial = ">=0.12.5"
+r-scales = ">=1.3.0"
+r-hdf5r = ">=1.3.8"
+r-remotes = ">=2.5.0"
+r-biocmanager = ">=1.30.22"

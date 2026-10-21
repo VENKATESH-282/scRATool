@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>scRATool</title>
+  <!-- Modern Clean CSS -->
+  <link rel="stylesheet" href="/static/css/app.css">
+  <!-- Plotly.js for interactive UMAP and Lasso Selection -->
+  <script src="/static/vendor/plotly.min.js"></script>
+  <script>if (!window.Plotly) document.write('<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"><\/script>');</script>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-icon">scR</div>
+      <div class="brand-text">
+        <h1>scRATool</h1>
+        
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-view="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <span>Dashboard</span>
+      </div>
+
+      <div class="nav-item" data-view="samples">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        <span>Samples & Inputs</span>
+      </div>
+
+      <div class="nav-item" data-view="params">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Parameters</span>
+      </div>
+
+      <div class="nav-item" data-view="runner">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <span>Run Monitor</span>
+      </div>
+
+      <div class="nav-item" data-view="explorer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        <span>Results Explorer</span>
+      </div>
+
+      <div class="nav-item" data-view="provenance">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <span>Provenance & Export</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div>Engine: Nextflow DSL2</div>
+      <div>Framework: Seurat 5 & Pixi</div>
+      <div style="margin-top: 4px; color: #94a3b8;">scRATool v1.0.0 (MIT)</div>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="page-title" id="current-page-title">System Overview & Status</div>
+      <div class="top-bar-actions">
+        <!-- Session Token Badge and Switcher -->
+        <div class="session-badge-container">
+          <div class="session-badge" title="Active Analysis Workspace Token">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            <span class="session-tag-label">SESSION:</span>
+            <code id="header-session-token" class="session-token-code">{{ initial_token or '----' }}</code>
+          </div>
+          <button class="btn btn-sm btn-outline" id="btn-copy-token" title="Copy Token to Clipboard">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span id="copy-token-feedback">Copy</span>
+          </button>
+          <button class="btn btn-sm btn-secondary" id="btn-quick-new-session" title="Generate New Session ID" onclick="SessionsController.createNewSessionDirect()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>+ New</span>
+          </button>
+          <button class="btn btn-sm btn-secondary" id="btn-sessions-modal" title="Manage or Switch Workspaces">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <span>Sessions</span>
+          </button>
+        </div>
+
+        <!-- Cluster Connection Status Button -->
+        <button id="header-cluster-btn" class="status-badge" style="cursor: pointer; border: 1px solid #cbd5e1; background: #f8fafc; color: #64748b; font-family: inherit; font-size: 13px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;" title="Click to view or connect to cluster" onclick="RemoteProfilesController.handleTopBarClick()">
+          <span class="status-dot" id="header-cluster-dot" style="background: #94a3b8;"></span>
+          <span id="header-cluster-text">Cluster: Disconnected</span>
+        </button>
+
+        <div id="system-status-badge" class="status-badge online">
+          <span class="status-dot"></span> Pipeline Ready
+        </div>
+        <div id="active-run-status-badge" class="status-badge" style="display: none;">
+          <span class="status-dot"></span> Idle
+        </div>
+        <button class="btn btn-primary" onclick="App.switchView('runner')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Run Pipeline
+        </button>
+      </div>
+    </header>
+
+    <div class="content-container">
+
+      <!-- VIEW 1: DASHBOARD -->
+      <section id="view-dashboard" class="view-section active">
+        <!-- Universal Pipeline Workflow Stepper & Getting Started Guide -->
+        <div class="card" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid var(--border); margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;">
+                Universal Single-Cell RNA-seq Analysis Platform
+              </h2>
+              <div style="font-size: 13px; color: #64748b;">
+                End-to-end automated downstream analysis workflow powered by Nextflow DSL2 and Seurat 5. Follow the 4 steps below to start a new analysis.
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="App.switchView('samples')" style="font-size: 13px; padding: 6px 14px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              Start New Analysis
+            </button>
+          </div>
+
+          <!-- 4-Step Interactive Stepper Grid -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+            <!-- Step 1 -->
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
+              <div>
+                <div style="margin-bottom: 6px;">
+                  <span style="font-size: 11px; font-weight: 700; color: var(--accent-base); text-transform: uppercase; letter-spacing: 0.5px;">Step 1</span>
+                </div>
+                <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Samples & Inputs</div>
+                <div style="font-size: 12px; color: #64748b; line-height: 1.5;">
+                  Load single-cell datasets, 10x matrices, CSV manifests, or download directly from NCBI GEO.
+                </div>
+              </div>
+              <button class="btn btn-secondary" style="font-size: 12px; padding: 4px 10px; width: 100%; justify-content: center;" onclick="App.switchView('samples')">
+                Set Up Samples &rarr;
+              </button>
+            </div>
+
+            <!-- Step 2 -->
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
+              <div>
+                <div style="margin-bottom: 6px;">
+                  <span style="font-size: 11px; font-weight: 700; color: var(--accent-base); text-transform: uppercase; letter-spacing: 0.5px;">Step 2</span>
+                </div>
+                <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Parameters</div>
+                <div style="font-size: 12px; color: #64748b; line-height: 1.5;">
+                  Configure organism, scType reference atlas, QC cutoffs, and custom biomarker panels.
+                </div>
+              </div>
+              <button class="btn btn-secondary" style="font-size: 12px; padding: 4px 10px; width: 100%; justify-content: center;" onclick="App.switchView('params')">
+                Set Parameters &rarr;
+              </button>
+            </div>
+
+            <!-- Step 3 -->
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
+              <div>
+                <div style="margin-bottom: 6px;">
+                  <span style="font-size: 11px; font-weight: 700; color: var(--accent-base); text-transform: uppercase; letter-spacing: 0.5px;">Step 3</span>
+                </div>
+                <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Run & Live Monitor</div>
+                <div style="font-size: 12px; color: #64748b; line-height: 1.5;">
+                  Launch pipeline runs locally or dispatch jobs to remote Slurm / Ubuntu HPC cluster.
+                </div>
+              </div>
+              <button class="btn btn-secondary" style="font-size: 12px; padding: 4px 10px; width: 100%; justify-content: center;" onclick="App.switchView('runner')">
+                Monitor Runs &rarr;
+              </button>
+            </div>
+
+            <!-- Step 4 -->
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;">
+              <div>
+                <div style="margin-bottom: 6px;">
+                  <span style="font-size: 11px; font-weight: 700; color: var(--accent-base); text-transform: uppercase; letter-spacing: 0.5px;">Step 4</span>
+                </div>
+                <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Results Explorer</div>
+                <div style="font-size: 12px; color: #64748b; line-height: 1.5;">
+                  Explore interactive Plotly UMAP, lasso custom cell groups, and view publication figures.
+                </div>
+              </div>
+              <button class="btn btn-secondary" style="font-size: 12px; padding: 4px 10px; width: 100%; justify-content: center;" onclick="App.switchView('explorer')">
+                Explore Results &rarr;
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Launch Cards -->
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">1-Click Fast Stub Test Run</span>
+              <span class="status-badge online">Verified</span>
+            </div>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">
+              Executes the full 14-stage Nextflow workflow in stub mode using synthetic test data in <code>assets/test_data/</code>. Validates graph execution, publishing, provenance, and manifest creation in seconds.
+            </p>
+            <button class="btn btn-primary" onclick="
+              App.switchView('runner');
+              document.getElementById('run-stub-cb').checked = true;
+              document.getElementById('run-profile-select').value = 'test';
+              document.getElementById('run-name-input').value = 'Stub-Validation-Run';
+              ParamsController.applyPreset('fast_test');
+            ">
+              Launch Stub Test
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Full Production Pipeline Run</span>
+              <span class="status-badge" style="background:#f1f5f9;">Configurable</span>
+            </div>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">
+              Runs full QC, integration benchmarking, multi-tool cell typing, differential expression, trajectory inference (Slingshot/Monocle3), CellChat, NicheNet, CopyKAT, and hdWGCNA.
+            </p>
+            <button class="btn btn-secondary" onclick="
+              App.switchView('runner');
+              document.getElementById('run-stub-cb').checked = false;
+              document.getElementById('run-profile-select').value = 'local,pixi';
+              document.getElementById('run-name-input').value = 'Production-Run';
+              ParamsController.applyPreset('default');
+            ">
+              Configure Production Run
+            </button>
+          </div>
+        </div>
+
+        <!-- System & Pipeline Information -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Pipeline Architecture & Path Mapping</span>
+          </div>
+          <div style="font-size: 13px; line-height: 1.8;">
+            <div><strong>Pipeline Directory:</strong> <code id="stat-pipeline-dir">{{ pipeline_dir }}</code></div>
+            <div><strong>Schema Specification:</strong> <code>nextflow_schema.json</code> (Draft-07, 11 Parameter Groups)</div>
+            <div><strong>Biological Flexibility:</strong> Universal organism support (Human, Mouse & custom genomes)</div>
+            <div><strong>Statistical Contrasts:</strong> Configurable baseline reference condition per dataset</div>
+            <div><strong>Analysis Modalities:</strong> QC, Integration, CellTyping, DE, Trajectories, Signaling & WGCNA</div>
+          </div>
+        </div>
+
+        <!-- Recent Runs -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Pipeline Executions</span>
+            <button class="btn btn-secondary" style="font-size: 13px;" onclick="App.fetchRuns()">Refresh</button>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Run Name</th>
+                  <th>ID</th>
+                  <th>Status</th>
+                  <th>Duration</th>
+                  <th>Created</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="recent-runs-tbody">
+                <tr><td colspan="6" style="text-align: center; color: #64748b; padding: 20px;">Loading runs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: SAMPLES & INPUTS -->
+      <section id="view-samples" class="view-section">
+        <div class="card">
+          <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
+            <div>
+              <div class="card-title">Samplesheet Configuration (samples.csv)</div>
+              <div style="font-size: 13px; color: #64748b;">Configure single-cell RNA-seq inputs (10x dirs, .h5, .h5ad, .txt.gz, .csv, or remote GEO http/ftp URLs).</div>
+            </div>
+            <div style="display:flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+              <!-- Preset Templates Dropdown -->
+              <select id="sample-preset-select" class="form-select" style="width: auto; font-size: 13px; padding: 5px 10px; background: #f8fafc; border-color: #475569;">
+                <option value="" disabled selected>Load Template...</option>
+                <option value="pbmc_human">Human PBMC Benchmark (4 samples)</option>
+                <option value="twocond_wt_ko">WT vs KO (4 samples)</option>
+                <option value="tenx_dir">10x Directory Structure</option>
+                <option value="blank">Blank / Custom Starter</option>
+              </select>
+
+              <!-- Import CSV -->
+              <input type="file" id="samples-file-input" accept=".csv,.txt,.tsv" style="display:none;">
+              <button class="btn btn-secondary" id="btn-upload-csv" title="Upload custom samplesheet CSV">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                Import CSV
+              </button>
+
+              <!-- Export CSV -->
+              <button class="btn btn-secondary" id="btn-export-csv" title="Export samplesheet as CSV">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Export CSV
+              </button>
+
+              <!-- Prefix Paths -->
+              <button class="btn btn-secondary" id="btn-prefix-paths" title="Prepend cluster directory to matrix paths">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                Prefix Paths
+              </button>
+
+              <button class="btn btn-secondary" id="add-sample-row-btn">+ Add Local Sample</button>
+              <button class="btn btn-secondary" id="add-remote-url-btn" title="Add a direct HTTP/FTP download link from GEO" style="color: #8b5cf6; border-color: #8b5cf6;">+ Add GEO/URL</button>
+              <button class="btn btn-secondary" id="validate-samplesheet-btn">Validate Local</button>
+              <button class="btn btn-secondary" onclick="SamplesController.verifyRemotePaths()" style="border-color: #3b82f6; color: #3b82f6;" title="Verify paths on the connected remote cluster">Verify on Cluster</button>
+              <button class="btn btn-secondary" onclick="SamplesController.syncToCluster()" style="border-color: #10b981; color: #059669; font-weight: 600;" title="Sync samples.csv directly to the connected cluster">Sync to Cluster</button>
+              <button class="btn btn-secondary" id="save-samplesheet-btn">Save Changes</button>
+            </div>
+          </div>
+
+          <!-- GEO Fetcher Bar -->
+          <div style="background: #faf5ff; border-bottom: 1px solid #e2e8f0; padding: 12px 20px; display: flex; align-items: center; gap: 12px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            <strong style="color: #4c1d95; font-size: 14px;">GEO Auto-Fetch:</strong>
+            <input type="text" id="geo-accession-input" class="form-input" placeholder="Enter Accession (e.g. GSE122873 or GSM3487560)" style="width: 320px; border-color: #cbd5e1; padding: 6px 12px;">
+            <button class="btn btn-primary" id="geo-fetch-btn" style="background-color: #8b5cf6 !important; border-color: #7c3aed !important; color: white !important;">Fetch Files</button>
+            <span id="geo-fetch-status" style="font-size: 13px; color: #6b7280; margin-left: 8px;"></span>
+          </div>
+
+          <!-- Baseline Reference Condition Selector Bar -->
+          <div style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; margin-bottom: 14px; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <div style="font-weight: 600; font-size: 13px; color: var(--text-dark); display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-base)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                Baseline Reference Condition (DE Control):
+              </div>
+              <select id="select-reference-condition" class="form-select" style="min-width: 140px; font-weight: 600; color: var(--accent-base); background: #fff; padding: 4px 8px; font-size: 13px;">
+                <option value="CTRL">CTRL</option>
+              </select>
+              <span style="font-size: 13px; color: var(--text-muted);">(Pairwise differential expression and functional scoring contrast all other groups against this condition)</span>
+            </div>
+            <div style="font-size: 13px; color: var(--text-muted); white-space: nowrap;">
+              Active Conditions: <strong id="detected-conditions-badge" style="color: var(--text-dark); background: #e2e8f0; padding: 2px 8px; border-radius: 4px;">CTRL</strong>
+            </div>
+          </div>
+
+          <div id="samplesheet-feedback" style="margin-bottom: 14px;"></div>
+
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 180px;">Sample ID</th>
+                  <th style="width: 140px;">Condition</th>
+                  <th style="width: 140px;">Patient / Donor ID</th>
+                  <th>Matrix File Path (.txt, .csv, .h5, .rds, 10x dir)</th>
+                  <th style="width: 130px;">Disk Status</th>
+                  <th style="width: 50px;"></th>
+                </tr>
+              </thead>
+              <tbody id="samplesheet-tbody">
+                <tr><td colspan="6" style="text-align: center; padding: 20px;">Loading samples...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Cluster Annotations Table -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Cluster Annotations Map (cluster_annotations.csv)</div>
+              <div style="font-size: 13px; color: #64748b;">Review consensus annotations and edit cell type assignments per cluster.</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-secondary" onclick="SamplesController.addAnnotationRow()">+ Add Cluster Row</button>
+              <button class="btn btn-secondary" id="save-annotations-btn">Save Annotations</button>
+            </div>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 70px; text-align: center;"><input type="checkbox" id="toggle-all-clusters-cb" checked title="Select / Deselect All Clusters" onclick="SamplesController.toggleAllClusters(this.checked)"> Include</th>
+                  <th style="width: 110px;">Cluster</th>
+                  <th style="width: 90px;">Cells</th>
+                  <th style="width: 190px;">Predicted Type (ScType/SingleR)</th>
+                  <th>Consensus Final Annotation</th>
+                </tr>
+              </thead>
+              <tbody id="annotations-tbody">
+                <tr><td colspan="5" style="text-align: center; padding: 20px;">Loading annotations...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: PARAMETERS -->
+      <section id="view-params" class="view-section">
+        <!-- Top Toolbar -->
+        <div class="card" style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <label class="form-label" style="margin: 0; white-space: nowrap;">Workflow Preset:</label>
+              <select id="preset-select" class="form-select" style="width: 260px;"></select>
+              <span id="preset-description" style="font-size: 13px; color: #64748b;"></span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <input type="text" id="param-search-input" class="form-input" placeholder="Search parameter by name..." style="width: 220px;">
+              <button class="btn btn-secondary" id="export-params-btn">Export params.json</button>
+              <button class="btn btn-secondary" id="reset-params-btn">Reset Defaults</button>
+              <button class="btn btn-primary" id="save-params-btn" onclick="ParamsController.saveParams()" style="background-color: #2563eb; color: white; font-weight: 600;">Save Parameters</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Groups Container -->
+        <div id="params-groups-container">
+          <div style="text-align: center; padding: 40px; color: #64748b;">Loading schema parameters...</div>
+        </div>
+
+        <!-- Bottom Save Toolbar -->
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; margin-bottom: 24px;">
+          <button class="btn btn-secondary" onclick="ParamsController.applyPreset('default')">Reset Defaults</button>
+          <button class="btn btn-primary" onclick="ParamsController.saveParams()" style="background-color: #2563eb; color: white; font-weight: 600; padding: 10px 24px; font-size: 15px;">Save Parameters</button>
+        </div>
+      </section>
+
+      <!-- VIEW 4: RUN MONITOR -->
+      <section id="view-runner" class="view-section">
+        <!-- Run Control Bar -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Launch Pipeline Run</span>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-danger" id="cancel-run-btn" disabled>Stop Run</button>
+              <button class="btn btn-primary" id="start-run-btn" style="background-color: #10b981 !important; color: white !important; border-color: #059669 !important;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                Start Pipeline Run
+              </button>
+            </div>
+          </div>
+
+          <div class="grid-3" style="margin-bottom: 16px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label">Run Label</label>
+              <input type="text" id="run-name-input" class="form-input" placeholder="e.g. My-scRNA-Analysis">
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label">Execution Location</label>
+              <select id="run-location-select" class="form-select" onchange="document.getElementById('remote-config-panel').style.display = this.value === 'remote' ? 'block' : 'none';">
+                <option value="local">Local Machine</option>
+                <option value="remote">Remote Ubuntu / Cluster</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label">Execution Profile</label>
+              <select id="run-profile-select" class="form-select">
+                <option value="local,pixi">Standard Pipeline (Pixi Environment)</option>
+                <option value="local">Active Environment (Current PATH/Conda)</option>
+                <option value="test">Test Profile (Synthetic Data)</option>
+              </select>
+            </div>
+
+
+            <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 20px; padding-top: 24px;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;">
+                <input type="checkbox" id="run-resume-cb" checked>
+                <span>Resume (<code>-resume</code>)</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;">
+                <input type="checkbox" id="run-stub-cb">
+                <span>Stub Mode (<code>-stub-run</code>)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Remote Configuration Panel -->
+          <div id="remote-config-panel" style="display: none; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+            <div style="font-weight: 700; font-size: 16px; margin-bottom: 12px; color: #1e293b;">Remote Ubuntu / SSH Configuration</div>
+
+            <!-- Active Cluster Connection Banner -->
+            <div id="cluster-connection-banner" style="display: none; margin-bottom: 14px; padding: 10px 14px; border-radius: 6px; font-size: 13px;"></div>
+
+            <div class="grid-3" style="margin-bottom: 12px;">
+              <div class="form-group">
+                <label class="form-label">Saved Profile</label>
+                <div style="display: flex; gap: 8px;">
+                  <select id="remote-profile-select" class="form-select" style="flex: 1;" onchange="RemoteProfilesController.onProfileSelectChanged()"></select>
+                  <button class="btn btn-secondary" onclick="document.getElementById('remote-profile-modal').classList.add('active');" title="Manage Profiles">⚙️</button>
+                  <button class="btn btn-primary" id="btn-cluster-toggle" onclick="RemoteProfilesController.toggleConnection()" style="font-size: 13px; font-weight: 600; min-width: 90px; background: #3b82f6; border-color: #2563eb; color: white;">Connect</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Remote Working Directory</label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="remote-dir-input" class="form-input" placeholder="/scratch/user/scratool_run" value="" style="flex: 1;" onchange="localStorage.setItem('scratool_remote_dir', this.value.trim());">
+                  <button class="btn btn-secondary" onclick="RemoteProfilesController.openBrowser('remote-dir-input')" title="Browse Remote Directories">📁 Browse</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Environment Initialization</label>
+                <input type="text" id="remote-env-input" class="form-input" placeholder="e.g. source ~/.bashrc && conda activate scrna-nf" value="">
+              </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-size: 13px; color: #64748b;">
+                * Make sure your remote system has nextflow and pipeline dependencies.
+              </div>
+              <button class="btn btn-secondary" id="btn-detect-remote-env">Detect Remote Environment</button> <button class="btn btn-warning" id="btn-install-remote-env" style="display: none; margin-left: 10px; background-color: #f59e0b; color: white; border: none;">Install Missing Tools</button>
+            </div>
+
+            <div id="remote-env-feedback" style="margin-top: 10px; font-size: 13px;"></div>
+          </div>
+          
+          <!-- Active Run Configuration & Selected Parameters Preview -->
+          <div id="run-params-summary" style="margin-top: 16px; margin-bottom: 20px; padding: 18px 20px; background: #ffffff; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 28px; height: 28px; border-radius: 6px; background: #eff6ff; display: flex; align-items: center; justify-content: center; color: #2563eb;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </div>
+                <div>
+                  <div style="font-size: 15px; font-weight: 700; color: #1e293b;" id="run-params-title">Selected Pipeline Run Configuration</div>
+                  <div style="font-size: 12px; color: #64748b;" id="run-params-subtitle">Review active parameters before starting the execution.</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" onclick="App.switchView('params')" style="font-size: 12px; font-weight: 600;">
+                  Edit Parameters
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="RunnerController.renderCurrentConfigPreview()" title="Refresh configuration preview" style="font-size: 12px;">
+                  Refresh
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btn-back-to-new-run" onclick="RunnerController.resetToNewRunConfig()" style="display: none; background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; font-size: 12px; font-weight: 600;">
+                  Prepare New Run
+                </button>
+              </div>
+            </div>
+
+            <!-- Historical Run Notification (shown when inspecting a past run) -->
+            <div id="historical-run-banner" style="display: none; margin-bottom: 14px; padding: 10px 14px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; font-size: 13px; color: #1e40af; justify-content: space-between; align-items: center;">
+              <span>Viewing historical execution record: <strong id="historical-run-id-label"></strong> (<span id="historical-run-status-label"></span>)</span>
+              <button class="btn btn-primary btn-sm" onclick="RunnerController.resetToNewRunConfig()" style="font-size: 11px;">Switch to New Run Config</button>
+            </div>
+
+            <!-- Parameters Grid / Categories -->
+            <div id="run-params-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; font-size: 13px;">
+              <!-- Dynamically populated by RunnerController.renderCurrentConfigPreview() -->
+            </div>
+          </div>
+
+          <!-- Stage Progress Stepper -->
+          <div style="margin-top: 14px; border-top: 1px solid var(--border); padding-top: 16px;">
+            <div style="font-size: 16px; font-weight: 700; color: #334155; margin-bottom: 10px;">Pipeline Workflow Stage Tracker</div>
+            <div class="stages-tracker" id="stages-tracker-container"></div>
+          </div>
+        </div>
+
+        <!-- Terminal Console -->
+        <div class="terminal-window">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <span class="terminal-dot dot-red"></span>
+              <span class="terminal-dot dot-yellow"></span>
+              <span class="terminal-dot dot-green"></span>
+              <span style="font-size: 13px; color: #64748b; margin-left: 8px;">Nextflow Execution Stream (.nextflow.log)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #64748b; cursor: pointer;">
+                <input type="checkbox" id="autoscroll-cb" checked> Auto-scroll
+              </label>
+              <button class="btn btn-secondary" style="padding: 2px 8px; font-size: 13px; background:#1e293b; color:#cbd5e1; border-color:#334155;" id="clear-log-btn">Clear</button>
+              <button class="btn btn-secondary" style="padding: 2px 8px; font-size: 13px; background:#1e293b; color:#cbd5e1; border-color:#334155;" id="download-log-btn">Download Log</button>
+            </div>
+          </div>
+          <div class="terminal-body" id="terminal-output">{{ initial_run_log or 'Ready to launch pipeline. Output logs will stream here in real time.' }}</div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: RESULTS EXPLORER -->
+      <section id="view-explorer" class="view-section">
+        <div class="card" style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <label class="form-label" style="margin: 0; white-space: nowrap; font-weight: 600;">Dataset / Run:</label>
+                <select id="explorer-run-select" class="form-select" style="min-width: 260px; font-weight: 600; color: var(--accent-active); background: var(--accent-subtle); border-color: var(--accent-border);"></select>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <label class="form-label" style="margin: 0; white-space: nowrap; font-weight: 600;">Workflow Stage:</label>
+                <select id="explorer-stage-select" class="form-select" style="min-width: 300px;"></select>
+              </div>
+
+              <!-- Dynamic Sync Button Container -->
+              <div id="remote-sync-container" style="display: inline-flex; align-items: center; gap: 8px;"></div>
+            </div>
+
+            <!-- Sub-tab switcher -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-primary explorer-tab-btn" data-tab="plots">Plots & Figures</button>
+              <button class="btn btn-secondary explorer-tab-btn" data-tab="umap">Interactive UMAP & Lasso</button>
+              <button class="btn btn-secondary explorer-tab-btn" data-tab="tables">Data Tables</button>
+              <button class="btn btn-secondary explorer-tab-btn" data-tab="files">All Output Files</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-panel 1: Plots Gallery -->
+        <div id="tab-panel-plots" class="explorer-tab-panel">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Generated Stage Plots</span>
+              <span style="font-size: 13px; color: #64748b;">Click on any image for full-resolution lightbox zoom</span>
+            </div>
+            <div class="gallery-grid" id="plots-gallery-container">
+              <div style="text-align: center; color: #64748b; padding: 40px; grid-column: 1/-1;">Loading gallery...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-panel 2: Interactive UMAP & Lasso Grouping -->
+        <div id="tab-panel-umap" class="explorer-tab-panel" style="display: none;">
+          <div class="grid-3" style="grid-template-columns: 2.2fr 1fr; gap: 16px;">
+            <!-- Plotly Container with Controls Toolbar -->
+            <div class="card" style="margin: 0; display: flex; flex-direction: column;">
+              <!-- UMAP Toolbar -->
+              <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; margin-bottom: 8px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <label style="font-size: 13px; font-weight: 600; color: #334155; margin: 0;">Color By:</label>
+                    <select id="umap-color-by" class="form-select" style="width: auto; padding: 4px 8px; font-size: 13px; font-weight: 600; background: #fff;">
+                      <option value="cell_type" selected>Cell Type Annotation</option>
+                      <option value="condition">Condition / Experimental Arm</option>
+                      <option value="sample_id">Sample / Biological Replicate</option>
+                      <option value="cluster">Seurat Harmony Cluster</option>
+                      <option value="dux4_score">Biomarker / Panel Score (Heatmap)</option>
+                      <option value="myogenesis_score">Pathway / Differentiation Score (Heatmap)</option>
+                      <option value="dux4_affected">Biomarker High (>0)</option>
+                    </select>
+                  </div>
+
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <label style="font-size: 13px; color: #64748b; margin: 0;">Size:</label>
+                    <input type="range" id="umap-point-size" min="2" max="8" value="4" style="width: 70px;">
+                    <span id="umap-point-size-val" style="font-size: 13px; color: #64748b;">4px</span>
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span id="umap-dataset-badge" class="status-badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 13px; padding: 4px 8px;">
+                    ● 6,688 Real Cells
+                  </span>
+                  <button class="btn btn-secondary" id="umap-reset-view-btn" style="padding: 2px 8px; font-size: 13px;" title="Reset UMAP axes">
+                    Reset Zoom
+                  </button>
+                </div>
+              </div>
+
+              <!-- Plotly Canvas -->
+              <div id="plotly-umap-container" style="width: 100%; height: 560px;"></div>
+            </div>
+
+            <!-- Lasso Custom Grouping Panel -->
+            <div class="card" style="margin: 0;">
+              <div class="card-header">
+                <span class="card-title">Lasso Cell Grouping</span>
+                <span class="status-badge" id="lasso-selected-count">0 cells selected</span>
+              </div>
+              <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">
+                Use the <strong>Lasso</strong> or <strong>Box Select</strong> tool on the plot to isolate any cell population. Save custom cohorts as metadata CSV subsets for targeted downstream analysis.
+              </p>
+
+              <!-- Dynamic Selection Breakdown -->
+              <div id="lasso-breakdown-card" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; margin-bottom: 14px;">
+                <div style="font-size: 13px; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Selection Composition:</div>
+                <div id="lasso-breakdown-content" style="font-size: 13px; color: #334155; line-height: 1.5;"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Custom Group Name</label>
+                <input type="text" id="lasso-group-name" class="form-input" placeholder="e.g. Regenerating_Satellite_Subset">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Description / Biological Note</label>
+                <textarea id="lasso-group-desc" class="form-input" rows="3" placeholder="e.g. High-pseudotime myogenic cluster selected for targeted WGCNA"></textarea>
+              </div>
+
+              <button class="btn btn-primary" id="save-lasso-group-btn" style="width: 100%; justify-content: center;" disabled>
+                Save Selected Cells to CSV
+              </button>
+              
+              <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--border);">
+              <div style="font-size: 14px; font-weight: 700; color: var(--accent-base); margin-bottom: 12px;">Saved Custom Cohorts</div>
+              <div id="lasso-saved-groups-list" style="display: flex; flex-direction: column; gap: 8px;">
+                 <div style="font-size: 12px; color: #94a3b8; text-align: center;">Loading saved cohorts...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-panel 3: Data Tables -->
+        <div id="tab-panel-tables" class="explorer-tab-panel" style="display: none;">
+          <div class="card">
+            <div class="card-header">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <label class="form-label" style="margin: 0;">Table File:</label>
+                <select id="table-file-select" class="form-select" style="width: 280px;"></select>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="text" id="table-search-input" class="form-input" placeholder="Search table..." style="width: 200px;">
+              </div>
+            </div>
+
+            <div class="data-table-wrapper" style="max-height: 480px;">
+              <table class="data-table">
+                <thead id="dynamic-table-thead"></thead>
+                <tbody id="dynamic-table-tbody"></tbody>
+              </table>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; font-size: 13px; color: #64748b;">
+              <span id="table-pagination-info">Showing page 1</span>
+              <div style="display: flex; gap: 6px;">
+                <button class="btn btn-secondary" id="table-prev-page-btn" style="padding: 4px 8px; font-size: 13px;">Previous</button>
+                <button class="btn btn-secondary" id="table-next-page-btn" style="padding: 4px 8px; font-size: 13px;">Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-panel 4: Output Files Manifest -->
+        <div id="tab-panel-files" class="explorer-tab-panel" style="display: none;">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">All Generated Output Artifacts</span>
+            </div>
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Filename</th>
+                    <th>Relative Path</th>
+                    <th>Size</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="manifest-files-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 6: PROVENANCE & EXPORT -->
+      <section id="view-provenance" class="view-section">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Reproducibility & Provenance Tracking</span>
+            <button class="btn btn-secondary" onclick="
+              fetch('/api/explorer/provenance').then(r=>r.json()).then(data=>{
+                document.getElementById('provenance-json-pre').textContent = JSON.stringify(data, null, 2);
+              })
+            ">Refresh Report</button>
+          </div>
+          <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">
+            Every run automatically creates <code>provenance.json</code> and <code>results_manifest.json</code> under <code>results/pipeline_info/</code>, locking all parameters, timestamps, nextflow versions, and outputs.
+          </p>
+
+          <div style="margin-bottom: 16px;">
+            <label class="form-label">Reproduce via CLI (Exact Equivalent Command):</label>
+            <div style="background: #0f172a; color: #38bdf8; padding: 12px 16px; border-radius: 6px; font-family: monospace; font-size: 13px; overflow-x: auto;">
+              nextflow run main.nf -params-file params.json -profile local,pixi -resume
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label">Latest <code>provenance.json</code> Content:</label>
+            <pre id="provenance-json-pre" style="background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 16px; font-size: 13px; max-height: 400px; overflow: auto; font-family: monospace;">{{ initial_provenance or '{\n  "status": "No provenance recorded yet. Run the pipeline to generate provenance.json"\n}' }}</pre>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Sessions Management Modal -->
+  <div id="sessions-modal" class="modal-backdrop">
+    <div class="modal-content" style="max-width: 680px; width: 90%;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          Analysis Workspaces & Tokens
+        </h2>
+        <button class="modal-close" id="sessions-modal-close-btn">&times;</button>
+      </div>
+
+      <!-- Active Session Details -->
+      <div class="session-active-box" style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 20px;">
+        <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700; margin-bottom: 6px;">Current Active Workspace</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <div style="font-weight: 700; font-size: 16px; color: var(--text-main); margin-bottom: 4px;" id="modal-active-session-name">Primary Analysis Workspace</div>
+            <code style="background: #e2e8f0; padding: 3px 8px; border-radius: 4px; font-size: 13px; font-weight: 700; letter-spacing: 0.05em;" id="modal-active-session-token">----</code>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-sm btn-outline" id="btn-modal-copy-token">Copy Token</button>
+            <button class="btn btn-sm btn-outline" id="btn-modal-duplicate">Duplicate</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Switch by Token Input -->
+      <div style="margin-bottom: 20px;">
+        <label class="form-label" style="font-weight: 600; margin-bottom: 6px;">Switch by Token (16-character code):</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="input-switch-token" class="form-control" placeholder="e.g. ABCD-EFGH-JKMN-PQRT" style="font-family: monospace; text-transform: uppercase;">
+          <button class="btn btn-primary" id="btn-do-switch-token">Switch</button>
+        </div>
+        <div id="switch-token-error" style="color: #ef4444; font-size: 13px; margin-top: 4px; display: none;"></div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <button class="btn btn-outline" id="btn-create-new-session" style="flex: 1;">
+          + Create New Blank Workspace
+        </button>
+      </div>
+
+      <!-- Recent Sessions List -->
+      <div>
+        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Recent Sessions on this Server:</div>
+        <div style="max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; padding: 8px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead style="background: #f1f5f9; text-align: left;">
+              <tr>
+                <th style="padding: 8px 12px; border-bottom: 1px solid var(--border);">Name</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid var(--border);">Token</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid var(--border);">Last Active</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="recent-sessions-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox-modal" class="modal-backdrop">
+    <div class="modal-content">
+      <button class="modal-close" id="lightbox-close-btn">&times;</button>
+      <div id="lightbox-caption" style="font-weight: 700; margin-bottom: 12px; font-size: 16px;"></div>
+      <img id="lightbox-img" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Plot Lightbox" style="max-width: 90vw; max-height: 80vh; object-fit: contain;">
+    </div>
+  </div>
+
+  <!-- Prefix Paths Modal -->
+  <div id="prefix-modal" class="modal-backdrop">
+    <div class="modal-content" style="max-width: 520px;">
+      <button class="modal-close" id="prefix-modal-close-btn">&times;</button>
+      <div style="font-weight: 700; font-size: 18px; margin-bottom: 8px;">📂 Bulk Directory Prefix Helper</div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+        Prepend a common root folder path (such as your cluster storage path) to all sample matrix files in the table.
+      </p>
+      <div class="form-group" style="margin-bottom: 14px;">
+        <label class="form-label">Base Directory Path</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="prefix-input-path" class="form-input" placeholder="/path/to/data/my_dataset/" style="font-family: monospace; flex: 1;">
+          <button class="btn btn-secondary" onclick="RemoteProfilesController.openBrowser('prefix-input-path')" title="Browse Remote Directories">📁 Browse Cluster</button>
+        </div>
+        <div class="form-desc">Trailing slash is handled automatically. Will prepend to any relative path or filename.</div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="btn btn-secondary" id="btn-cancel-prefix">Cancel</button>
+        <button class="btn btn-primary" id="btn-apply-prefix">Apply Prefix to All Rows</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remote Profiles Management Modal -->
+  <div id="remote-profile-modal" class="modal-backdrop">
+    <div class="modal-content" style="max-width: 640px;">
+      <button class="modal-close" onclick="document.getElementById('remote-profile-modal').classList.remove('active')">&times;</button>
+      <div style="font-weight: 700; font-size: 18px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-base)" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+        Manage Remote Cluster Profiles
+      </div>
+      
+      <!-- List of Profiles -->
+      <div style="margin-bottom: 16px; max-height: 150px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; padding: 8px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead style="background: #f1f5f9; text-align: left;">
+            <tr>
+              <th style="padding: 8px 12px; border-bottom: 1px solid var(--border);">Name</th>
+              <th style="padding: 8px 12px; border-bottom: 1px solid var(--border);">Host</th>
+              <th style="padding: 8px 12px; border-bottom: 1px solid var(--border);">User</th>
+              <th style="padding: 8px 12px; border-bottom: 1px solid var(--border);">Action</th>
+            </tr>
+          </thead>
+          <tbody id="remote-profiles-tbody">
+            <tr><td colspan="4" style="text-align: center; padding: 10px;">Loading profiles...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Add New Profile Form -->
+      <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+        <div style="font-weight: 600; font-size: 13px; margin-bottom: 10px;">Add New Profile</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <label class="form-label">Profile Name</label>
+            <input type="text" id="prof-name" class="form-input" placeholder="e.g. My Research Cluster">
+          </div>
+          <div>
+            <label class="form-label">SSH Host / IP</label>
+            <input type="text" id="prof-host" class="form-input" placeholder="e.g. cluster.university.edu">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <label class="form-label">SSH Username</label>
+            <input type="text" id="prof-user" class="form-input" placeholder="username">
+          </div>
+          <div>
+            <label class="form-label">SSH Port</label>
+            <input type="number" id="prof-port" class="form-input" value="22">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <label class="form-label">Authentication Method</label>
+            <select id="prof-auth" class="form-select" onchange="
+              document.getElementById('prof-pass-div').style.display = this.value === 'password' ? 'block' : 'none';
+              document.getElementById('prof-key-div').style.display = this.value === 'key' ? 'block' : 'none';
+            ">
+              <option value="password">Password</option>
+              <option value="key">Private Key</option>
+            </select>
+          </div>
+          <div id="prof-pass-div">
+            <label class="form-label">Password</label>
+            <input type="password" id="prof-pass" class="form-input" placeholder="••••••••">
+          </div>
+          <div id="prof-key-div" style="display: none;">
+            <label class="form-label">Private Key Path</label>
+            <input type="text" id="prof-key" class="form-input" placeholder="~/.ssh/id_rsa">
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width: 100%;" onclick="RemoteProfilesController.addProfile()">
+          + Add Profile
+        </button>
+      </div>
+      <div id="profile-action-feedback" style="font-size: 13px;"></div>
+    </div>
+  </div>
+
+  <!-- Remote Directory Browser Modal -->
+  <div id="remote-dir-modal" class="modal-backdrop">
+    <div class="modal-content" style="max-width: 600px;">
+      <button class="modal-close" onclick="document.getElementById('remote-dir-modal').classList.remove('active')">&times;</button>
+      <div style="font-weight: 700; font-size: 18px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-base)" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+        Browse Remote Directory
+      </div>
+      
+      <div id="cluster-dir-browser" style="background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px;">
+        <div style="font-weight: 600; font-size: 13px; margin-bottom: 8px;">Current Path:</div>
+        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <input type="text" id="cluster-current-path" class="form-input" style="font-family: monospace; font-size: 13px; flex: 1;">
+          <button class="btn btn-secondary btn-sm" onclick="RemoteProfilesController.browseDir(document.getElementById('cluster-current-path').value)">Go</button>
+          <button class="btn btn-secondary btn-sm" id="btn-show-new-folder" onclick="document.getElementById('new-folder-container').style.display='flex'; this.style.display='none';" title="Create a new folder in the current directory">+ New Folder</button>
+          <div id="new-folder-container" style="display: none; gap: 4px;">
+            <input type="text" id="new-folder-name" class="form-input" style="font-family: monospace; font-size: 13px; width: 150px;" placeholder="Folder name">
+            <button class="btn btn-primary btn-sm" onclick="RemoteProfilesController.createFolder()">Create</button>
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('new-folder-container').style.display='none'; document.getElementById('btn-show-new-folder').style.display='inline-block';">Cancel</button>
+          </div>
+        </div>
+        <div id="cluster-dirs-list" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; padding: 6px; margin-bottom: 10px; font-size: 13px; font-family: monospace;"></div>
+        <button class="btn btn-primary btn-sm" onclick="RemoteProfilesController.selectDir()" style="font-weight: bold; background-color: #2563eb;">
+          ✔ Save Location & Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Initial Data from Server -->
+  <script>
+    window.__INITIAL_STAGES__ = {{ initial_stages | tojson | safe }};
+    window.__INITIAL_TOKEN__ = {{ initial_token | tojson | safe }};
+  </script>
+
+  <!-- Load Sub-controllers -->
+  <script src="/static/js/sessions.js?v=3"></script>
+  <script src="/static/js/samples.js?v=7"></script>
+  <script src="/static/js/cluster.js?v=5"></script>
+  <script src="/static/js/params.js?v=2"></script>
+  <script src="/static/js/runner.js?v=9"></script>
+  <script src="/static/js/explorer.js?v=6"></script>
+  <script src="/static/js/app.js?v=4"></script>
+
+</body>
+</html>

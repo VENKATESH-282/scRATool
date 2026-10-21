@@ -1,38 +1,62 @@
-# ── Python / Flask ──
-webapp/venv/
-webapp/__pycache__/
-webapp/sessions/
-webapp/uploads/
-webapp/webapp.log
-*.pyc
+# Environments & Package Managers
+.pixi/
+.pixi.lock
 __pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+env/
+venv/
+ENV/
 
-# ── Nextflow ──
-nextflow/.nextflow/
-nextflow/.nextflow.log*
-nextflow/work/
-nextflow/results*/
-nextflow/small_geo/
-nextflow/.current_csv
-nextflow/host_watcher.log
+# Databases & Runtime State (Never commit credentials or historical run state)
+*.db
+*.sqlite
+*.sqlite3
+platform.db
+scratool.db
+app/scratool.db
 
-# ── Credentials (NEVER commit these) ──
-nextflow/.server_password
-nextflow/.server_config.json
-nextflow/ui_pass.txt
-nextflow/ui_cmd.txt
-nextflow/ui_outdir.txt
+# Pipeline Run Directories & Workspaces
+work/
+runs/
+sessions/
+results/
+results_test/
+.nextflow/
+.nextflow.log*
 
-# ── OS / IDE ──
-.DS_Store
-Thumbs.db
-.vscode/
+# User Data & Big Files
+data/
+*.h5
+*.h5ad
+*.rds
+*.bam
+*.sam
+*.fastq.gz
+*.fq.gz
+assets/custom_groups/*.csv
+
+# SSH Keys & Credentials
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# Test & IDE Artifacts
+.pytest_cache/
+.coverage
+htmlcov/
 .idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
 
-# ── Archives & temp files ──
-*.zip
-*.tar.gz
+# Temporary Files
+*.tmp
 *.bak
-*.log
-sync_*.py
-remote_grep.py
+test_geo_output.txt

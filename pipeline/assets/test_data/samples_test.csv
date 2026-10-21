@@ -1,0 +1,5 @@
+sample_id,condition,patient_id,file_path
+Sample_CTRL_1,CTRL,Donor_A,/data/pbmc_study/CTRL_1/filtered_feature_bc_matrix.h5
+Sample_CTRL_2,CTRL,Donor_B,/data/pbmc_study/CTRL_2/filtered_feature_bc_matrix.h5
+Sample_TREATED_1,TREATED,Donor_C,/data/pbmc_study/TREATED_1/filtered_feature_bc_matrix.h5
+Sample_TREATED_2,TREATED,Donor_D,/data/pbmc_study/TREATED_2/filtered_feature_bc_matrix.h5

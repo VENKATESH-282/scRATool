@@ -1,0 +1,5 @@
+sample_id,condition,patient_id,file_path
+Sample_CTRL_1,CTRL,Donor_A,data/CTRL_1.csv
+Sample_CTRL_2,CTRL,Donor_B,data/CTRL_2.csv
+Sample_TREATED_1,TREATED,Donor_C,data/TREATED_1.csv
+Sample_TREATED_2,TREATED,Donor_D,data/TREATED_2.csv

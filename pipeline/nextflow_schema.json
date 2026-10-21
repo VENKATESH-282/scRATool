@@ -1,0 +1,613 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/scRATool/nextflow_schema.json",
+  "title": "scRATool Downstream scRNA-seq Analysis Pipeline Parameters",
+  "description": "Configuration schema for the automated scRATool Nextflow DSL2 single-cell RNA-seq downstream pipeline.",
+  "type": "object",
+  "definitions": {
+    "hpc_cluster_options": {
+      "title": "HPC, Slurm & Remote SSH Cluster Options",
+      "type": "object",
+      "description": "HPC workload manager (Slurm), partition queues, SSH remote host details, and cluster project directory location.",
+      "properties": {
+        "execution_target": {
+          "type": "string",
+          "enum": [
+            "local",
+            "slurm_local",
+            "ssh_remote"
+          ],
+          "default": "local",
+          "description": "Target execution environment: Local System, Local Slurm Cluster, or Remote SSH Cluster."
+        },
+        "queue": {
+          "type": "string",
+          "default": "general",
+          "description": "Slurm partition / queue name for cluster job submissions (e.g. 'general', 'gpu', 'batch')."
+        },
+        "account": {
+          "type": "string",
+          "default": "",
+          "description": "Slurm account / allocation name for cluster job billing (e.g. 'my_lab_account')."
+        },
+        "cluster_options": {
+          "type": "string",
+          "default": "",
+          "description": "Custom resource directives passed directly to Slurm sbatch (e.g. '--account=my_lab --qos=express --time=24:00:00')."
+        },
+        "ssh_host": {
+          "type": "string",
+          "default": "",
+          "description": "Remote Cluster SSH Address / Hostname (e.g. 'cluster.university.edu' or IP address)."
+        },
+        "ssh_user": {
+          "type": "string",
+          "default": "",
+          "description": "Remote Cluster Username."
+        },
+        "ssh_port": {
+          "type": "integer",
+          "default": 22,
+          "description": "Remote SSH Port (default 22)."
+        },
+        "remote_work_dir": {
+          "type": "string",
+          "default": "",
+          "description": "Cluster Project Directory Location where the analysis files and results should be created."
+        }
+      }
+    },
+    "local_system_options": {
+      "title": "Local System Resource Options",
+      "type": "object",
+      "description": "CPU thread count and RAM memory allocation when running locally.",
+      "properties": {
+        "max_cpus": {
+          "type": "integer",
+          "default": 16,
+          "minimum": 1,
+          "maximum": 256,
+          "description": "Number of CPU threads dedicated for local pipeline execution (e.g. 8, 16, 32)."
+        },
+        "max_memory": {
+          "type": "string",
+          "default": "32GB",
+          "description": "Maximum RAM allocation limit for local system processes (e.g. '32GB', '64GB')."
+        }
+      }
+    },
+    "input_output_options": {
+      "title": "Input / Output Options",
+      "type": "object",
+      "description": "Input datasets, annotation maps, reference directories, and destination paths.",
+      "required": [
+        "samplesheet",
+        "outdir"
+      ],
+      "properties": {
+        "samplesheet": {
+          "type": "string",
+          "format": "file-path",
+          "default": "assets/samples.csv",
+          "description": "Path to CSV sample manifest with columns: sample_id, condition, patient_id, file_path.",
+          "help_text": "Count matrices can be gzipped TSV/TXT (*.txt.gz), Matrix Market format (*.mtx.gz with barcodes.tsv.gz and features.tsv.gz), or HDF5 (*.h5)."
+        },
+        "annotation_map": {
+          "type": "string",
+          "format": "file-path",
+          "default": "assets/cluster_annotations.csv",
+          "description": "Path to CSV mapping unsupervised cluster IDs to consensus biological cell types.",
+          "help_text": "Must contain at least 'cluster' and 'consensus_annotation' columns without placeholder text."
+        },
+        "models_dir": {
+          "type": "string",
+          "format": "directory-path",
+          "default": "models",
+          "description": "Directory containing NicheNet prior models (ligand_target_matrix.rds, lr_network.rds, weighted_networks.rds).",
+          "help_text": "If models are missing from this path, the pipeline automatically fetches them from Zenodo/GitHub."
+        },
+        "outdir": {
+          "type": "string",
+          "format": "directory-path",
+          "default": "results",
+          "description": "Output directory where all published tables, figures, metadata, and RDS objects are saved."
+        }
+      }
+    },
+    "experimental_design": {
+      "title": "Experimental Design & Biological Context",
+      "type": "object",
+      "description": "Biological baseline condition, tissue queries, and analysis seed.",
+      "properties": {
+        "reference_condition": {
+          "type": "string",
+          "default": "CTRL",
+          "description": "Baseline reference group (e.g. CTRL/Healthy) used as denominator for all pairwise DE contrasts and comparative signaling."
+        },
+        "tissue": {
+          "type": "string",
+          "default": "auto",
+          "description": "Tissue type for scType cell annotation. Use 'auto' to let scType scan all tissues."
+        },
+        "target_celltypes": {
+          "type": "string",
+          "default": "auto",
+          "description": "Comma-separated cell types for hdWGCNA analysis. 'auto' uses the top 2 most abundant types."
+        },
+        "seed": {
+          "type": "integer",
+          "default": 42,
+          "description": "Global pseudo-random number generator seed ensuring reproducible clustering, UMAP embeddings, and sampling."
+        },
+        "organism": {
+          "type": "string",
+          "default": "human",
+          "description": "Target organism. Determines annotation databases (org.Hs.eg.db / org.Mm.eg.db), CellChat DB, and NicheNet models.",
+          "enum": [
+            "human",
+            "mouse"
+          ],
+          "fa_icon": "fas fa-dna"
+        }
+      }
+    },
+    "qc_filtering_options": {
+      "title": "Quality Control & Gene Filtering",
+      "type": "object",
+      "description": "Cellular viability thresholds, mitochondrial filter cutoffs, and variable feature counts.",
+      "properties": {
+        "nfeature_min": {
+          "type": "integer",
+          "default": 500,
+          "minimum": 50,
+          "maximum": 5000,
+          "description": "Minimum number of detected genes (nFeature_RNA) per cell."
+        },
+        "nfeature_max": {
+          "type": "integer",
+          "default": 6000,
+          "minimum": 1000,
+          "maximum": 30000,
+          "description": "Maximum number of detected genes (nFeature_RNA) per cell (removes potential multiplet artifacts)."
+        },
+        "ncount_min": {
+          "type": "integer",
+          "default": 800,
+          "minimum": 100,
+          "maximum": 20000,
+          "description": "Minimum unique molecular identifiers (nCount_RNA) per cell."
+        },
+        "ncount_max": {
+          "type": "integer",
+          "default": 50000,
+          "minimum": 5000,
+          "maximum": 200000,
+          "description": "Maximum unique molecular identifiers (nCount_RNA) per cell."
+        },
+        "mt_thresh": {
+          "type": "number",
+          "default": 15.0,
+          "minimum": 1.0,
+          "maximum": 50.0,
+          "description": "Maximum allowable percentage of mitochondrial transcripts (percent.mt) per cell."
+        },
+        "min_pct_cells": {
+          "type": "number",
+          "default": 0.1,
+          "minimum": 0.01,
+          "maximum": 5.0,
+          "description": "Minimum percentage of cells in which a gene must be detected to be retained (preserves DUX4 allowlist)."
+        },
+        "n_hvg": {
+          "type": "integer",
+          "default": 2000,
+          "minimum": 500,
+          "maximum": 10000,
+          "description": "Number of highly variable genes (HVGs) selected via variance-stabilizing transformation (vst)."
+        }
+      }
+    },
+    "integration_clustering_options": {
+      "title": "Integration & Clustering Options",
+      "type": "object",
+      "description": "Batch effect correction benchmarks, dimensional reductions, and clustering resolution sweep.",
+      "properties": {
+        "preferred_method": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "harmony",
+            "cca",
+            "rpca"
+          ],
+          "default": "auto",
+          "description": "Integration algorithm choice. 'auto' selects the optimal method based on cell mixing entropy vs condition preservation."
+        },
+        "npcs": {
+          "type": "integer",
+          "default": 30,
+          "minimum": 10,
+          "maximum": 100,
+          "description": "Number of principal components computed and utilized for dimensional reduction."
+        },
+        "cluster_resolutions": {
+          "type": "string",
+          "default": "0.2,0.4,0.6,0.8,1.0",
+          "description": "Comma-separated string of Louvain/Leiden clustering resolutions to evaluate with silhouette analysis."
+        },
+        "default_resolution": {
+          "type": "number",
+          "default": 0.6,
+          "minimum": 0.1,
+          "maximum": 2.0,
+          "description": "Primary clustering resolution utilized for downstream annotation and differential expression."
+        }
+      }
+    },
+    "cell_annotation_options": {
+      "title": "Cell Annotation Options",
+      "type": "object",
+      "description": "Marker discovery cutoffs and automated annotation tuning.",
+      "properties": {
+        "marker_min_pct": {
+          "type": "number",
+          "default": 0.25,
+          "minimum": 0.05,
+          "maximum": 0.9,
+          "description": "Minimum cell fraction expressing a marker during FindAllMarkers cluster discovery."
+        },
+        "marker_logfc_thresh": {
+          "type": "number",
+          "default": 0.25,
+          "minimum": 0.1,
+          "maximum": 2.0,
+          "description": "Minimum log2 fold-change threshold for cluster marker discovery."
+        },
+        "top_n_markers": {
+          "type": "integer",
+          "default": 5,
+          "minimum": 1,
+          "maximum": 50,
+          "description": "Number of top cluster-defining markers exported per cluster."
+        },
+        "sctype_quantile": {
+          "type": "number",
+          "default": 0.6,
+          "minimum": 0.1,
+          "maximum": 0.95,
+          "description": "Confidence score quantile cutoff for scType annotation below which clusters are labeled 'Unknown'."
+        }
+      }
+    },
+    "differential_expression_options": {
+      "title": "Differential Expression & Pseudobulk Options",
+      "type": "object",
+      "description": "Statistical testing thresholds for single-cell and pseudobulk contrasts.",
+      "properties": {
+        "de_test": {
+          "type": "string",
+          "enum": [
+            "wilcox",
+            "t",
+            "bimod",
+            "LR"
+          ],
+          "default": "wilcox",
+          "description": "Statistical test used for cell-level FindMarkers comparisons."
+        },
+        "de_min_pct": {
+          "type": "number",
+          "default": 0.1,
+          "minimum": 0.01,
+          "maximum": 1.0,
+          "description": "Minimum cell fraction expressing a gene to test in cell-level DE."
+        },
+        "de_logfc_thresh": {
+          "type": "number",
+          "default": 0.25,
+          "minimum": 0.05,
+          "maximum": 2.0,
+          "description": "Absolute log2 fold-change cutoff for defining significant differentially expressed genes."
+        },
+        "de_fdr_thresh": {
+          "type": "number",
+          "default": 0.05,
+          "minimum": 0.001,
+          "maximum": 0.2,
+          "description": "False discovery rate (Benjamini-Hochberg adjusted p-value) cutoff for DE significance."
+        },
+        "pb_min_counts": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Minimum aggregated pseudobulk counts per gene across samples for DESeq2 testing."
+        },
+        "pb_min_samples": {
+          "type": "integer",
+          "default": 2,
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Minimum number of biological samples with non-zero pseudobulk expression."
+        }
+      }
+    },
+    "trajectory_options": {
+      "title": "Trajectory & Lineage Options",
+      "type": "object",
+      "description": "Root selection and smoothing parameters for trajectory inference.",
+      "properties": {
+        "trajectory_root_celltype": {
+          "type": "string",
+          "default": "Satellite",
+          "description": "Keyword matching cell type used to identify root origin for pseudotime ordering (e.g. 'Satellite')."
+        },
+        "slingshot_approx_points": {
+          "type": "integer",
+          "default": 150,
+          "minimum": 50,
+          "maximum": 500,
+          "description": "Number of points used for cubic smoothing splines along Slingshot lineages."
+        }
+      }
+    },
+    "cell_communication_options": {
+      "title": "Cell-Cell Communication & Signaling Options",
+      "type": "object",
+      "description": "CellChat and NicheNet intercellular signaling parameters.",
+      "properties": {
+        "cellchat_min_cells": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 5,
+          "maximum": 100,
+          "description": "Minimum cell count in a subpopulation required to evaluate intercellular communication in CellChat."
+        },
+        "cellchat_prob_type": {
+          "type": "string",
+          "enum": [
+            "triMean",
+            "truncatedMean"
+          ],
+          "default": "triMean",
+          "description": "Averaging method for calculating communication probability in CellChat."
+        },
+        "nichenet_receiver": {
+          "type": "string",
+          "default": "Satellite",
+          "description": "Keyword matching receiver cell type for NicheNet upstream ligand prioritization."
+        },
+        "nichenet_min_expr_pct": {
+          "type": "number",
+          "default": 0.05,
+          "minimum": 0.01,
+          "maximum": 0.5,
+          "description": "Minimum expression fraction in sender/receiver cells to consider ligands and receptors expressed."
+        },
+        "nichenet_top_ligands": {
+          "type": "integer",
+          "default": 20,
+          "minimum": 5,
+          "maximum": 50,
+          "description": "Number of top prioritized upstream ligands to rank and plot."
+        },
+        "nichenet_cutoff": {
+          "type": "number",
+          "default": 0.25,
+          "minimum": 0.05,
+          "maximum": 0.9,
+          "description": "Regulatory potential score cutoff for ligand-target link heatmap visualization."
+        }
+      }
+    },
+    "cnv_and_networks_options": {
+      "title": "CNV & hdWGCNA Co-Expression Options",
+      "type": "object",
+      "description": "CopyKAT aneuploidy parameters and hdWGCNA co-expression network tuning.",
+      "properties": {
+        "copykat_min_cells": {
+          "type": "integer",
+          "default": 200,
+          "minimum": 50,
+          "maximum": 1000,
+          "description": "Minimum cells per sample required to execute CopyKAT aneuploidy prediction."
+        },
+        "copykat_genome": {
+          "type": "string",
+          "enum": [
+            "hg20",
+            "mm10"
+          ],
+          "default": "hg20",
+          "description": "CopyKAT reference genome. Use 'hg20' for human or 'mm10' for mouse."
+        },
+        "copykat_ks_cut": {
+          "type": "number",
+          "default": 0.1,
+          "minimum": 0.01,
+          "maximum": 0.5,
+          "description": "Kolmogorov-Smirnov test cutoff for distinguishing aneuploid from diploid single cells."
+        },
+        "hdwgcna_k_metacell": {
+          "type": "integer",
+          "default": 20,
+          "minimum": 5,
+          "maximum": 50,
+          "description": "Number of nearest neighbors aggregated per metacell in hdWGCNA."
+        },
+        "hdwgcna_min_cells": {
+          "type": "integer",
+          "default": 40,
+          "minimum": 20,
+          "maximum": 200,
+          "description": "Minimum number of cells required in a cell type per sample to construct metacells."
+        },
+        "hdwgcna_target_metacells": {
+          "type": "integer",
+          "default": 1000,
+          "minimum": 100,
+          "maximum": 5000,
+          "description": "Target number of metacells constructed per cell type."
+        },
+        "hdwgcna_min_module_size": {
+          "type": "integer",
+          "default": 30,
+          "minimum": 10,
+          "maximum": 100,
+          "description": "Minimum number of co-expressed genes required to define an hdWGCNA network module."
+        },
+        "hdwgcna_merge_cut_height": {
+          "type": "number",
+          "default": 0.25,
+          "minimum": 0.05,
+          "maximum": 0.5,
+          "description": "Dendrogram branch cut height for merging correlated module eigengenes."
+        }
+      }
+    },
+    "stage_toggles": {
+      "title": "Skip Flags",
+      "type": "object",
+      "description": "Checkbox skip flags to bypass specific pipeline processing steps.",
+      "properties": {
+        "skip_cellranger": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip CellRanger"
+        },
+        "skip_pdx": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip PDX processing"
+        },
+        "skip_qc": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip QC"
+        },
+        "skip_integration": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip Integration"
+        },
+        "skip_annotation": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip Annotation"
+        },
+        "skip_de": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip DE"
+        },
+        "skip_trajectory": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip Trajectory"
+        },
+        "skip_cellchat": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip CellChat"
+        },
+        "skip_nichenet": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip NicheNet"
+        },
+        "skip_copykat": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip CopyKAT"
+        },
+        "skip_hdwgcna": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip hdWGCNA"
+        },
+        "skip_velocity": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip RNA Velocity"
+        },
+        "skip_figures": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip Figures"
+        }
+      }
+    },
+    "custom_biology": {
+      "title": "Custom Biology & Gene Panels",
+      "type": "object",
+      "description": "User-defined gene lists and biology-specific configuration. Leave empty for generic analysis.",
+      "properties": {
+        "custom_gene_allowlist": {
+          "type": "string",
+          "default": "",
+          "description": "Comma-separated gene symbols to always retain during QC gene filtering (e.g., rare biomarkers that would otherwise be filtered out). Leave empty for standard filtering.",
+          "fa_icon": "fas fa-shield-alt"
+        },
+        "custom_gene_panel": {
+          "type": "string",
+          "default": "",
+          "description": "Comma-separated gene symbols for canonical marker profiling, module scoring, and publication figure dotplots (e.g., PAX7,MYF5,MYOD1,MYOG for muscle). Leave empty to skip custom marker analysis.",
+          "fa_icon": "fas fa-list"
+        },
+        "scoring_gene_sets": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a CSV file with custom gene sets for AddModuleScore (columns: set_name, gene_symbol). Leave empty to skip custom pathway scoring.",
+          "fa_icon": "fas fa-chart-bar"
+        },
+        "trajectory_exclude_pattern": {
+          "type": "string",
+          "default": "",
+          "description": "Regex pattern of cell types to exclude from trajectory analysis (e.g., 'Stromal|Immune'). Leave empty to include all cell types.",
+          "fa_icon": "fas fa-filter"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/definitions/hpc_cluster_options"
+    },
+    {
+      "$ref": "#/definitions/local_system_options"
+    },
+    {
+      "$ref": "#/definitions/input_output_options"
+    },
+    {
+      "$ref": "#/definitions/experimental_design"
+    },
+    {
+      "$ref": "#/definitions/custom_biology"
+    },
+    {
+      "$ref": "#/definitions/qc_filtering_options"
+    },
+    {
+      "$ref": "#/definitions/integration_clustering_options"
+    },
+    {
+      "$ref": "#/definitions/cell_annotation_options"
+    },
+    {
+      "$ref": "#/definitions/differential_expression_options"
+    },
+    {
+      "$ref": "#/definitions/trajectory_options"
+    },
+    {
+      "$ref": "#/definitions/cell_communication_options"
+    },
+    {
+      "$ref": "#/definitions/cnv_and_networks_options"
+    },
+    {
+      "$ref": "#/definitions/stage_toggles"
+    }
+  ]
+}

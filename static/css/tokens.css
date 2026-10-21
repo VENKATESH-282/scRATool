@@ -1,0 +1,119 @@
+/* scRATool GUI — Design Tokens
+   Purpose-built scientific instrument aesthetic: paper palette, deep ink, monospace data, crisp radii */
+
+@import url('/static/vendor/fonts/fonts.css');
+
+:root {
+  /* Light Theme — Scientific Notebook / Paper Aesthetic */
+  --bg-canvas: #F8F7F4;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F1F0EC;
+  --bg-muted: #E8E6E0;
+  --bg-overlay: rgba(17, 24, 39, 0.45);
+
+  --text-main: #111827;
+  --text-secondary: #4B5563;
+  --text-muted: #6B7280;
+  --text-inverse: #FFFFFF;
+
+  --border-subtle: #E5E7EB;
+  --border-medium: #D1D5DB;
+  --border-strong: #9CA3AF;
+
+  /* Accent: Precision Deep Scientific Teal */
+  --accent-base: #0F766E;
+  --accent-hover: #115E59;
+  --accent-active: #134E4A;
+  --accent-subtle: #F0FDFA;
+  --accent-border: #99F6E4;
+  --accent-contrast: #FFFFFF;
+
+  /* Status Colors */
+  --color-success-bg: #F0FDF4;
+  --color-success-border: #BBF7D0;
+  --color-success-text: #15803D;
+
+  --color-running-bg: #FFFBEB;
+  --color-running-border: #FDE68A;
+  --color-running-text: #B45309;
+
+  --color-failed-bg: #FEF2F2;
+  --color-failed-border: #FECACA;
+  --color-failed-text: #B91C1C;
+
+  --color-cached-bg: #ECFEFF;
+  --color-cached-border: #A5F3FC;
+  --color-cached-text: #0E7490;
+
+  --color-neutral-bg: #F3F4F6;
+  --color-neutral-border: #E5E7EB;
+  --color-neutral-text: #4B5563;
+
+  /* Typography */
+  --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'JetBrains Mono', 'SF Mono', Menlo, Monaco, Consolas, 'DejaVu Sans Mono', monospace;
+
+  /* Spacing Grid (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Radii (Crisp, instrument-grade) */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+
+  /* Shadows (Subtle elevation) */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark Theme — Precision Dark Slate */
+[data-theme="dark"] {
+  --bg-canvas: #0B0F19;
+  --bg-surface: #111827;
+  --bg-subtle: #1E293B;
+  --bg-muted: #334155;
+  --bg-overlay: rgba(0, 0, 0, 0.7);
+
+  --text-main: #F9FAFB;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --text-inverse: #0B0F19;
+
+  --border-subtle: #1E293B;
+  --border-medium: #334155;
+  --border-strong: #475569;
+
+  --accent-base: #14B8A6;
+  --accent-hover: #2DD4BF;
+  --accent-active: #5EEAD4;
+  --accent-subtle: #132E35;
+  --accent-border: #115E59;
+  --accent-contrast: #042F2E;
+
+  --color-success-bg: #052E16;
+  --color-success-border: #166534;
+  --color-success-text: #4ADE80;
+
+  --color-running-bg: #451A03;
+  --color-running-border: #92400E;
+  --color-running-text: #FBBF24;
+
+  --color-failed-bg: #450A0A;
+  --color-failed-border: #991B1B;
+  --color-failed-text: #F87171;
+
+  --color-cached-bg: #083344;
+  --color-cached-border: #155E75;
+  --color-cached-text: #38BDF8;
+
+  --color-neutral-bg: #1F2937;
+  --color-neutral-border: #374151;
+  --color-neutral-text: #9CA3AF;
+}

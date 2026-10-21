@@ -1,0 +1,10 @@
+{
+  "name": "My_HPC_Cluster",
+  "host": "cluster.institution.edu",
+  "user": "username",
+  "port": 22,
+  "auth_method": "password",
+  "password": "your_secure_password",
+  "private_key_path": "",
+  "is_default": true
+}
