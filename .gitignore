@@ -24,11 +24,15 @@ runs/
 sessions/
 results/
 results_test/
+results_demo/
+pipeline/results/
 .nextflow/
 .nextflow.log*
 
 # User Data & Big Files
 data/
+samples.csv
+assets/
 *.h5
 *.h5ad
 *.rds
