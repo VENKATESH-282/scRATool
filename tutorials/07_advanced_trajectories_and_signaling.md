@@ -6,7 +6,7 @@ scRATool integrates seven advanced analytical modules in Stages 07 through 13.
 
 ---
 
-## 🛤️ Part 1: Trajectory & Pseudotime Inference (Stages 07 & 08)
+## ️ Part 1: Trajectory & Pseudotime Inference (Stages 07 & 08)
 
 ### 1. Monocle 3 (Stage 07)
 * **Algorithmic Basis:** Constructs a low-dimensional manifold using reversed graph embedding (`learn_graph`).
@@ -23,7 +23,7 @@ scRATool integrates seven advanced analytical modules in Stages 07 through 13.
 
 ---
 
-## 📡 Part 2: Intercellular Communication & Signaling (Stages 09 & 10)
+## Part 2: Intercellular Communication & Signaling (Stages 09 & 10)
 
 ### 1. CellChat v2 (Stage 09)
 * **Mass-Action Communication Modeling:** Quantifies communication probability between cell types using the law of mass action on curated ligand-receptor pairs from `CellChatDB` (supports human and mouse).
@@ -41,7 +41,7 @@ scRATool integrates seven advanced analytical modules in Stages 07 through 13.
 
 ---
 
-## 🧬 Part 3: Cancer Genetics & Co-Expression Networks (Stages 11, 12, 13)
+## Part 3: Cancer Genetics & Co-Expression Networks (Stages 11, 12, 13)
 
 ### 1. CopyKAT Genomic CNV Profiling (Stage 11)
 * **Aneuploidy vs. Diploid Resolution:** In tumor biopsies, identifying malignant cells from infiltrating stromal or immune cells can be challenging. CopyKAT estimates read-depth chromosomal copy-number alterations (CNAs) from scRNA-seq counts.

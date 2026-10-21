@@ -6,7 +6,7 @@ scRATool tackles these artifacts through **dual-method decontamination benchmark
 
 ---
 
-## 🔬 Part 1: Ambient RNA Removal (SoupX vs. DecontX)
+## Part 1: Ambient RNA Removal (SoupX vs. DecontX)
 
 ### The Problem
 During droplet generation in microfluidic channels, a fraction of cells inevitably lyse. Their released messenger RNA enters the cell suspension ("the soup") and is co-encapsulated into droplets alongside intact cells. This leads to false background detection of highly expressed tissue-specific genes across all cell types (e.g., hemoglobin genes in immune cells, or collagen in epithelial clusters).
@@ -44,7 +44,7 @@ scRATool runs both **SoupX** and **Celda DecontX** in parallel:
 
 ---
 
-## 👥 Part 2: Multiplet & Doublet Detection (scDblFinder vs. DoubletFinder)
+## Part 2: Multiplet & Doublet Detection (scDblFinder vs. DoubletFinder)
 
 ### The Problem
 When two distinct cells are co-encapsulated in the same oil droplet (heterotypic doublets), they produce an artificial hybrid transcriptome (e.g., a droplet expressing both T-cell *CD3D* and B-cell *MS4A1*). If uncorrected, these false intermediates corrupt trajectory graphs and generate spurious intermediate cell types.
@@ -56,7 +56,7 @@ When two distinct cells are co-encapsulated in the same oil droplet (heterotypic
 
 ---
 
-## 🧩 Part 3: Multi-Method Batch Integration (CCA vs. RPCA vs. Harmony vs. FastMNN)
+## Part 3: Multi-Method Batch Integration (CCA vs. RPCA vs. Harmony vs. FastMNN)
 
 A common challenge in multi-donor single-cell studies is distinguishing true biological variation from technical batch effects (different sequencing runs, chemistry versions, or clinical sites).
 
@@ -71,7 +71,7 @@ scRATool tests **four state-of-the-art integration methods** on SCTransform v2 n
 
 ---
 
-## 📐 Part 4: Quantitative Evaluation with kBET & LISI
+## Part 4: Quantitative Evaluation with kBET & LISI
 
 Instead of relying solely on subjective visual inspection of UMAP plots, scRATool computes rigorous quantitative metrics in `results/03_integration/integration_benchmarking.csv`:
 
@@ -91,7 +91,7 @@ LISI assesses whether batches are mixed while simultaneously preserving biologic
 
 ---
 
-## 🏆 Automated Integration Selection
+## Automated Integration Selection
 
 scRATool ranks each method by the composite harmonic score:
 $$\text{Score} = \frac{\text{iLISI}}{\text{cLISI}} \times (1 - \text{kBET})$$

@@ -6,7 +6,7 @@ scRATool provides native, built-in remote HPC cluster integration. You can confi
 
 ---
 
-## 🏛️ Remote Execution Architecture
+## ️ Remote Execution Architecture
 
 ```text
 ┌─────────────────────────────────┐               ┌─────────────────────────────────┐
@@ -30,7 +30,7 @@ scRATool provides native, built-in remote HPC cluster integration. You can confi
 
 ---
 
-## 🔑 Step 1: HPC Cluster Authentication Setup
+## Step 1: HPC Cluster Authentication Setup
 
 scRATool connects to your cluster's login node over standard SSH (port 22).
 
@@ -56,20 +56,20 @@ If your institution uses password authentication, simply select `Password` and e
 
 ---
 
-## 📂 Step 2: Remote Scratch Directory & Directory Browser
+## Step 2: Remote Scratch Directory & Directory Browser
 
 1. Enter your designated cluster scratch directory in the **Remote Project Directory** field:
    ```text
    /scratch/users/username/scratool_runs/experiment_01
    ```
-2. Click **📁 Browse Cluster**. The modal file browser communicates via SFTP to let you:
+2. Click **Browse Cluster**. The modal file browser communicates via SFTP to let you:
    * Visually verify that input count matrices exist on cluster storage.
    * Create new project folders.
    * Select reference genome or annotation directories.
 
 ---
 
-## ⚙️ Step 3: SLURM Configuration (`pipeline/conf/cluster.config`)
+## ️ Step 3: SLURM Configuration (`pipeline/conf/cluster.config`)
 
 Nextflow automatically translates stage resource directives into SLURM job submission parameters. Inspect `pipeline/conf/cluster.config`:
 
@@ -116,7 +116,7 @@ If a stage encounters an Out-Of-Memory (OOM) event (Exit code 137 or 247), Nextf
 
 ---
 
-## 🚀 Step 4: Dispatching the Pipeline
+## Step 4: Dispatching the Pipeline
 
 1. In the Web GUI, click **Launch Remote Pipeline**.
 2. scRATool performs the following automated steps:
@@ -127,7 +127,7 @@ If a stage encounters an Out-Of-Memory (OOM) event (Exit code 137 or 247), Nextf
 
 ---
 
-## 🔬 Step 5: Headless Command-Line Execution (CLI)
+## Step 5: Headless Command-Line Execution (CLI)
 
 If you prefer executing directly from a remote terminal or `tmux` session on the cluster:
 
@@ -151,7 +151,7 @@ nextflow run pipeline/main.nf \
 
 ---
 
-## 🛠️ Troubleshooting Cluster Issues
+## ️ Troubleshooting Cluster Issues
 
 ### 1. `sbatch: error: Memory specification exceeds partition limit`
 * Edit `pipeline/conf/cluster.config` and lower the maximum memory in `process_high` to fit your institution's partition limit (e.g., change `128.GB` to `64.GB`).

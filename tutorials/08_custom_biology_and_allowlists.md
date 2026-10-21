@@ -6,7 +6,7 @@ scRATool provides built-in mechanisms to adapt to any organism, tissue, or custo
 
 ---
 
-## 🐭 Part 1: Analyzing Mouse & Other Model Organisms
+## Part 1: Analyzing Mouse & Other Model Organisms
 
 scRATool dynamically configures its annotation engines, signaling databases, and annotation dictionaries based on the `--organism` parameter:
 
@@ -27,7 +27,7 @@ nextflow run pipeline/main.nf \
 
 ---
 
-## 🛡️ Part 2: Custom Gene Allowlist (Rescuing Rare Biomarkers)
+## ️ Part 2: Custom Gene Allowlist (Rescuing Rare Biomarkers)
 
 ### The Problem: Why Rare Disease Genes Get Discarded
 In standard scRNA-seq quality control:
@@ -54,7 +54,7 @@ nextflow run pipeline/main.nf \
 
 ---
 
-## 🎯 Part 3: Custom Marker Gene Panels (`--custom_gene_panel`)
+## Part 3: Custom Marker Gene Panels (`--custom_gene_panel`)
 
 If your project focuses on a defined biological pathway or therapeutic target panel, pass them via `--custom_gene_panel`:
 

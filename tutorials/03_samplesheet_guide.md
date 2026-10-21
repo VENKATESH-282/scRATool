@@ -6,7 +6,7 @@ Because scRATool is designed to be **universal**, it directly ingests count matr
 
 ---
 
-## 📋 The Standard 4-Column Samplesheet Format
+## The Standard 4-Column Samplesheet Format
 
 Your samplesheet must be a standard comma-separated CSV file with a header containing four mandatory columns:
 
@@ -25,7 +25,7 @@ sample_id,condition,patient_id,file_path
 
 ---
 
-## 🗂️ In-Depth Examples for Each Input Format
+## ️ In-Depth Examples for Each Input Format
 
 ### 1. 10x Genomics Chromium Output Directory
 Points to the standard folder produced by `cellranger count`:
@@ -72,11 +72,11 @@ GEO_Sample_1,Healthy,Donor_G1,https://ftp.ncbi.nlm.nih.gov/geo/series/GSE117nnn/
 
 ---
 
-## 🎯 Multi-Donor Experimental Design: Why `patient_id` is Critical
+## Multi-Donor Experimental Design: Why `patient_id` is Critical
 
 In Stage 05 (Differential Expression), scRATool avoids false discoveries caused by pseudoreplication by performing **multi-donor pseudo-bulk DESeq2 testing**.
 
-### ⚠️ Common Mistake:
+### Note: Common Mistake:
 ```csv
 # WRONG: Setting patient_id equal to sample_id when multiple samples come from the same individual
 sample_id,condition,patient_id,file_path
@@ -84,7 +84,7 @@ Sample_Day0,Control,Donor_1,data/d0.h5
 Sample_Day7,Treated,Donor_2,data/d7.h5  <-- Mistake! Both were drawn from Donor_1
 ```
 
-### ✅ Correct Design:
+### Correct Design:
 ```csv
 # RIGHT: Properly mapping biological replicates
 sample_id,condition,patient_id,file_path
@@ -97,7 +97,7 @@ By accurately declaring `Patient_01` as the shared biological donor, Stage 05 ca
 
 ---
 
-## 🔍 Validation Checklist Before Running
+## Validation Checklist Before Running
 
 Before launching your pipeline, verify:
 * [ ] No duplicate `sample_id` values exist.

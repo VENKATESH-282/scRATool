@@ -6,7 +6,7 @@ scRATool solves both challenges in **Stage 04 (Triangulated Consensus Annotation
 
 ---
 
-## 🏷️ Part 1: Triangulated Cell-Type Annotation (Stage 04)
+## ️ Part 1: Triangulated Cell-Type Annotation (Stage 04)
 
 Rather than trusting a single automated caller, scRATool combines **three independent annotation paradigms**:
 
@@ -53,12 +53,12 @@ For every single cell and cluster:
 
 ---
 
-## ⚖️ Part 2: Multi-Donor Pseudo-Bulk Differential Expression (Stage 05)
+## ️ Part 2: Multi-Donor Pseudo-Bulk Differential Expression (Stage 05)
 
 ### The "Pseudoreplication Trap" in Single-Cell DE
 Traditional single-cell workflows often run two-sample Wilcoxon rank-sum tests or $t$-tests treating **each cell as an independent biological replicate**.
 
-> **⚠️ Why this is statistically flawed:**
+> **Note: Why this is statistically flawed:**
 > Cells sampled from the same patient are **not independent**; they share the same genetic background, microenvironment, and library prep artifacts.
 > 
 > When you test 10,000 cells from 3 Control donors against 10,000 cells from 3 Disease donors using a cell-level test, the effective degrees of freedom is artificially inflated by orders of magnitude. The test produces thousands of statistically significant genes with microscopic p-values ($p < 10^{-300}$), most of which are false discoveries driven by donor-level technical noise rather than true disease biology.
@@ -84,7 +84,7 @@ pseudo_bulk_counts <- AggregateExpression(
 
 ---
 
-## 📈 Part 3: Functional Pathway Enrichment (GSEA & Enrichr)
+## Part 3: Functional Pathway Enrichment (GSEA & Enrichr)
 
 All significant differentially expressed genes ($\text{FDR} < 0.05$, $|\log_2 \text{FC}| > 0.5$) are automatically routed through functional enrichment analysis:
 

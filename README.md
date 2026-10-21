@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧬 scRATool
+# scRATool
 ### Universal Single-Cell RNA Sequencing Downstream Analysis Platform
 **Reproducible Nextflow DSL2 Workflow • Seurat v5 & Bioconductor Engine • Asynchronous FastAPI Web GUI**
 
@@ -14,25 +14,25 @@
 [![R: 4.4+](https://img.shields.io/badge/R-4.4%2B-276DC3.svg)](https://www.r-project.org/)
 
 <p align="center">
-  <a href="#-quickstart-in-60-seconds">⚡ 60-Second Quickstart</a> •
-  <a href="#-web-gui-tour--interactive-umap">🖥️ Web GUI Tour</a> •
-  <a href="#-pipeline-architecture">🏛️ Architecture</a> •
-  <a href="#-the-14-analysis-stages">🔬 14 Stages</a> •
-  <a href="#-multi-method-benchmarking">📊 Benchmarking</a> •
-  <a href="#-samplesheet--input-formats">📁 Data Inputs</a> •
-  <a href="#-hpc-cluster--slurm-dispatch">🖥️ HPC Cluster</a> •
-  <a href="#-in-depth-tutorials">📚 Tutorials</a>
+  <a href="#quickstart-in-60-seconds">Quickstart in 60 Seconds</a> •
+  <a href="#web-gui-tour--interactive-umap">Web GUI Tour</a> •
+  <a href="#pipeline-architecture">Architecture</a> •
+  <a href="#the-14-analysis-stages">14 Stages</a> •
+  <a href="#multi-method-benchmarking">Benchmarking</a> •
+  <a href="#samplesheet--input-formats">Data Inputs</a> •
+  <a href="#hpc-cluster--slurm-dispatch">HPC Cluster</a> •
+  <a href="#in-depth-tutorials">Tutorials</a>
 </p>
 
 ---
 
 </div>
 
-## 📖 What is scRATool?
+## What is scRATool?
 
 **scRATool** (*single-cell Reproducible Automated Tool*) is an end-to-end downstream analysis platform that automates the entire single-cell data science lifecycle. It integrates **14 modular analytical stages**—from raw count matrix decontamination through multi-method batch integration, consensus cell-type annotation, trajectory modeling, intercellular communication networks, and RNA velocity vector preparation—within a deterministic **Nextflow DSL2** engine.
 
-### Why scRATool?
+### Key Capabilities
 * **Zero Scripting for Biologists:** An interactive, browser-based graphical user interface (GUI) provides real-time stage monitoring, parameter configuration, high-resolution plot exploration, and an **interactive Plotly UMAP with Lasso/Box subpopulation selection** to dynamically isolate cell cohorts and export custom metadata.
 * **Deterministic Rigour for Bioinformaticians:** Orchestrated via Nextflow DSL2 with built-in multi-method benchmarking (SoupX vs. DecontX, scDblFinder vs. DoubletFinder, Seurat CCA vs. RPCA vs. Harmony vs. FastMNN), multi-donor pseudo-bulk DESeq2 testing, automated checkpoint-and-resume caching (`-resume`), and multi-format object export (`.rds`, `.h5ad`, `SingleCellExperiment`, `Loom`).
 * **Universal Matrix Ingestion:** Ingests 10x Genomics Cell Ranger directories, HDF5 (`.h5`, `.h5ad`), compressed tabular matrices (`.csv.gz`, `.tsv.gz`), serialized Seurat `.rds` objects, or remote NCBI GEO accessions directly over HTTPS.
@@ -40,7 +40,7 @@
 
 ---
 
-## ⚡ Quickstart in 60 Seconds
+## Quickstart in 60 Seconds
 
 You can run scRATool either through the **interactive Web GUI** or headlessly via the **command line (CLI)**.
 
@@ -61,7 +61,7 @@ pip install -r requirements.txt
 ```
 
 Now open your browser and navigate to:
-👉 **`http://localhost:8051`**
+**`http://localhost:8051`**
 
 ```text
 ================================================================================
@@ -100,47 +100,47 @@ nextflow run pipeline/main.nf \
   Profiles Active  : test,local,pixi
 ================================================================================
 
-[01/14] STAGE_01_QC_FILTERING             [100%] 1 of 1 ✔
-[02/14] STAGE_02_QC_TOOL_COMPARE          [100%] 1 of 1 ✔
-[03/14] STAGE_03_INTEGRATION_CLUSTERING   [100%] 1 of 1 ✔
-[04/14] STAGE_04_CELL_TYPE_ANNOTATION     [100%] 1 of 1 ✔
-[05/14] STAGE_05_DIFFERENTIAL_EXPRESSION  [100%] 1 of 1 ✔
-[06/14] STAGE_06_OBJECT_CONVERSION        [100%] 1 of 1 ✔
-[07/14] STAGE_07_MONOCLE3_TRAJECTORY      [100%] 1 of 1 ✔
-[08/14] STAGE_08_SLINGSHOT_LINEAGES       [100%] 1 of 1 ✔
-[09/14] STAGE_09_CELLCHAT_COMMUNICATION   [100%] 1 of 1 ✔
-[10/14] STAGE_10_NICHENET_SIGNALING       [100%] 1 of 1 ✔
-[11/14] STAGE_11_COPYKAT_CNV              [100%] 1 of 1 ✔
-[12/14] STAGE_12_HDWGCNA_NETWORKS         [100%] 1 of 1 ✔
-[13/14] STAGE_13_VELOCITY_EXPORT          [100%] 1 of 1 ✔
-[14/14] STAGE_14_PUBLICATION_FIGURES      [100%] 1 of 1 ✔
+[01/14] STAGE_01_QC_FILTERING             [100%] 1 of 1 [OK]
+[02/14] STAGE_02_QC_TOOL_COMPARE          [100%] 1 of 1 [OK]
+[03/14] STAGE_03_INTEGRATION_CLUSTERING   [100%] 1 of 1 [OK]
+[04/14] STAGE_04_CELL_TYPE_ANNOTATION     [100%] 1 of 1 [OK]
+[05/14] STAGE_05_DIFFERENTIAL_EXPRESSION  [100%] 1 of 1 [OK]
+[06/14] STAGE_06_OBJECT_CONVERSION        [100%] 1 of 1 [OK]
+[07/14] STAGE_07_MONOCLE3_TRAJECTORY      [100%] 1 of 1 [OK]
+[08/14] STAGE_08_SLINGSHOT_LINEAGES       [100%] 1 of 1 [OK]
+[09/14] STAGE_09_CELLCHAT_COMMUNICATION   [100%] 1 of 1 [OK]
+[10/14] STAGE_10_NICHENET_SIGNALING       [100%] 1 of 1 [OK]
+[11/14] STAGE_11_COPYKAT_CNV              [100%] 1 of 1 [OK]
+[12/14] STAGE_12_HDWGCNA_NETWORKS         [100%] 1 of 1 [OK]
+[13/14] STAGE_13_VELOCITY_EXPORT          [100%] 1 of 1 [OK]
+[14/14] STAGE_14_PUBLICATION_FIGURES      [100%] 1 of 1 [OK]
 
 Pipeline execution completed successfully!
 ```
 
 ---
 
-## 🏛️ Pipeline Architecture
+## Pipeline Architecture
 
 ```mermaid
 flowchart TD
-    subgraph INGESTION ["📥 Universal Ingestion"]
+    subgraph INGESTION ["Universal Ingestion"]
         A["Single-Cell Data<br/>(10x Directories / .h5 / .h5ad / .txt.gz / .rds / NCBI GEO)"]
     end
 
-    subgraph QC ["🔬 Quality Control & Decontamination"]
+    subgraph QC ["Quality Control & Decontamination"]
         B["Stage 01: QC & Decontamination<br/>(SoupX + DropletUtils + scDblFinder + Adaptive MADs)"]
         C["Stage 02: QC Tool Comparison<br/>(Empirical Benchmark: SoupX vs. DecontX & scDblFinder vs. DoubletFinder)"]
     end
 
-    subgraph INTEGRATION ["🧩 Normalization, Batch Correction & Annotation"]
+    subgraph INTEGRATION ["Normalization, Batch Correction & Annotation"]
         D["Stage 03: Integration & Clustering<br/>(SCTransform v2 + Benchmark: CCA / RPCA / Harmony / FastMNN + kBET/LISI)"]
         E["Stage 04: Cell-Type Annotation<br/>(Triangulated Consensus Voting: SingleR + scType + scCATCH)"]
         F["Stage 05: Differential Expression<br/>(Multi-Donor Pseudo-Bulk DESeq2 + clusterProfiler GSEA & Enrichr)"]
         G["Stage 06: Object Structures<br/>(Cross-Platform Export: Seurat RDS, AnnData .h5ad, SCE, Loom)"]
     end
 
-    subgraph ADVANCED ["📈 Trajectory, Networks & Signaling"]
+    subgraph ADVANCED ["Trajectory, Networks & Signaling"]
         H["Stage 07: Monocle 3 Trajectory<br/>(Graph Learning, Pseudotime Manifold & Kinetic Curves)"]
         I["Stage 08: Slingshot Lineages<br/>(Simultaneous Principal Curves & tradeSeq GAM Dynamics)"]
         J["Stage 09: CellChat v2 Communication<br/>(Mass-Action Signaling Networks & Interaction Chords)"]
@@ -150,7 +150,7 @@ flowchart TD
         N["Stage 13: Velocity Vector Export<br/>(Spliced/Unspliced Layers for scVelo & CellRank)"]
     end
 
-    subgraph FIGURES ["📊 Publication Outputs"]
+    subgraph FIGURES ["Publication Outputs"]
         O["Stage 14: Publication Figures<br/>(Automated Multi-Panel Composite 300 DPI PNG & Vector PDF)"]
     end
 
@@ -174,7 +174,7 @@ flowchart TD
 
 ---
 
-## 🖥️ Web GUI Tour & Interactive UMAP
+## Web GUI Tour & Interactive UMAP
 
 The scRATool web platform provides six dedicated views:
 
@@ -230,7 +230,7 @@ Inspect single-cell embeddings colored by consensus cell types, conditions, or c
 
 ---
 
-## 🔬 The 14 Analysis Stages
+## The 14 Analysis Stages
 
 | Stage | Module Name | Primary Objective | Algorithmic Tools | Published Outputs |
 | :---: | :--- | :--- | :--- | :--- |
@@ -251,7 +251,7 @@ Inspect single-cell embeddings colored by consensus cell types, conditions, or c
 
 ---
 
-## 📊 Multi-Method Benchmarking
+## Multi-Method Benchmarking
 
 Unlike conventional "black box" pipelines, scRATool provides quantitative empirical comparisons:
 
@@ -273,7 +273,7 @@ Stage 03 evaluates normalized embeddings against two quantitative metrics:
 
 ---
 
-## 📁 Samplesheet & Input Formats
+## Samplesheet & Input Formats
 
 scRATool accepts count matrices across **five flexible entry modes**:
 
@@ -293,7 +293,7 @@ Sample_TREATED_2,Treated,Donor_D,https://ftp.ncbi.nlm.nih.gov/geo/series/GSE117n
 
 ---
 
-## 🖥️ HPC Cluster & SLURM Dispatch
+## HPC Cluster & SLURM Dispatch
 
 You can dispatch scRATool jobs to any HPC cluster (SLURM, SGE, PBS) directly through the web GUI:
 
@@ -309,22 +309,22 @@ You can dispatch scRATool jobs to any HPC cluster (SLURM, SGE, PBS) directly thr
 
 ---
 
-## 📚 In-Depth Tutorials
+## In-Depth Tutorials
 
 Explore our dedicated, step-by-step guides covering every facet of single-cell analysis:
 
-* 📖 **[Tutorial 1: Quickstart with 10x Genomics PBMC Data](tutorials/01_quickstart_pbmc3k.md)** — Complete hands-on tutorial using real PBMC count matrices, from download to publication figures.
-* 🖥️ **[Tutorial 2: Web GUI Walkthrough & Interactive UMAP Manual](tutorials/02_gui_walkthrough.md)** — Visual tour of workspace session tokens, samplesheet builder, live SSE terminal, and Plotly lasso sub-clustering.
-* 📋 **[Tutorial 3: Samplesheet & Biological Metadata Guide](tutorials/03_samplesheet_guide.md)** — Comprehensive guide to 10x directories, H5 files, compressed CSVs, and multi-donor experimental designs.
-* 🚀 **[Tutorial 4: Enterprise HPC & SLURM Deployment](tutorials/04_hpc_slurm_guide.md)** — Remote SSH/SFTP architecture, cluster profiles, memory escalation on OOM, and headless execution.
-* 🔬 **[Tutorial 5: QC Decontamination & Batch Integration Benchmarking](tutorials/05_qc_and_benchmarking.md)** — SoupX vs DecontX ambient RNA correction, doublet detection, and quantitative kBET/LISI evaluation.
-* 🏷️ **[Tutorial 6: Consensus Cell Typing & Pseudo-bulk Differential Expression](tutorials/06_annotation_and_differential_expression.md)** — Triangulated annotation (SingleR + scType + scCATCH) and avoiding single-cell pseudoreplication with DESeq2.
-* 🛤️ **[Tutorial 7: Trajectories, Intercellular Signaling & Gene Networks](tutorials/07_advanced_trajectories_and_signaling.md)** — Monocle 3, Slingshot, CellChat v2, NicheNet v2, CopyKAT CNV, and hdWGCNA co-expression networks.
-* 🛡️ **[Tutorial 8: Custom Organisms, Tissues & Allowlist Biomarker Rescue](tutorials/08_custom_biology_and_allowlists.md)** — Analyzing Mouse/non-human datasets and preserving ultra-rare disease biomarkers from being discarded during QC.
+* **[Tutorial 1: Quickstart with 10x Genomics PBMC Data](tutorials/01_quickstart_pbmc3k.md)** — Complete hands-on tutorial using real PBMC count matrices, from download to publication figures.
+* **[Tutorial 2: Web GUI Walkthrough & Interactive UMAP Manual](tutorials/02_gui_walkthrough.md)** — Visual tour of workspace session tokens, samplesheet builder, live SSE terminal, and Plotly lasso sub-clustering.
+* **[Tutorial 3: Samplesheet & Biological Metadata Guide](tutorials/03_samplesheet_guide.md)** — Comprehensive guide to 10x directories, H5 files, compressed CSVs, and multi-donor experimental designs.
+* **[Tutorial 4: Enterprise HPC & SLURM Deployment](tutorials/04_hpc_slurm_guide.md)** — Remote SSH/SFTP architecture, cluster profiles, memory escalation on OOM, and headless execution.
+* **[Tutorial 5: QC Decontamination & Batch Integration Benchmarking](tutorials/05_qc_and_benchmarking.md)** — SoupX vs DecontX ambient RNA correction, doublet detection, and quantitative kBET/LISI evaluation.
+* **[Tutorial 6: Consensus Cell Typing & Pseudo-bulk Differential Expression](tutorials/06_annotation_and_differential_expression.md)** — Triangulated annotation (SingleR + scType + scCATCH) and avoiding single-cell pseudoreplication with DESeq2.
+* **[Tutorial 7: Trajectories, Intercellular Signaling & Gene Networks](tutorials/07_advanced_trajectories_and_signaling.md)** — Monocle 3, Slingshot, CellChat v2, NicheNet v2, CopyKAT CNV, and hdWGCNA co-expression networks.
+* **[Tutorial 8: Custom Organisms, Tissues & Allowlist Biomarker Rescue](tutorials/08_custom_biology_and_allowlists.md)** — Analyzing Mouse/non-human datasets and preserving ultra-rare disease biomarkers from being discarded during QC.
 
 ---
 
-## 📂 Repository Directory Structure
+## Repository Directory Structure
 
 ```text
 scRATool/
@@ -354,7 +354,7 @@ scRATool/
 
 ---
 
-## 🛠️ Frequently Asked Questions & Troubleshooting
+## Frequently Asked Questions & Troubleshooting
 
 <details>
 <summary><b>1. How does Checkpoint-and-Resume (-resume) work?</b></summary>
@@ -378,18 +378,18 @@ For massive datasets, activate the `cluster` profile in `pipeline/conf/cluster.c
 <details>
 <summary><b>4. How do I cite scRATool in my research?</b></summary>
 
-Please see the [Citation](#-citation) section below.
+Please see the [Citation](#citation) section below.
 </details>
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## ✉️ Citation
+## Citation
 
 If you use scRATool in your research, please cite:
 

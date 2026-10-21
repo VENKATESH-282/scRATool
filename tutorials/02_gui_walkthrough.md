@@ -4,7 +4,7 @@ The **scRATool Graphical User Interface (GUI)** is a high-performance web applic
 
 ---
 
-## 🚀 Launching the Web Interface
+## Launching the Web Interface
 
 ### Local Machine
 In the root directory of scRATool:
@@ -12,7 +12,7 @@ In the root directory of scRATool:
 ./start.sh
 ```
 Open your browser to:
-👉 **`http://localhost:8051`**
+**`http://localhost:8051`**
 
 ### Remote Server / HPC Head Node (via SSH Port Forwarding)
 If scRATool is running on a remote server or university compute node, forward port `8051` to your local machine:
@@ -28,7 +28,7 @@ Now navigate to `http://localhost:8051` in your local browser!
 
 ---
 
-## 🗂️ 1. Workspace Isolation & Session Token System
+## ️ 1. Workspace Isolation & Session Token System
 
 Every analysis project in scRATool is tied to a secure **16-character session token** (e.g. `8CPN-MM8W-3A2Q-Z6U4`).
 
@@ -44,7 +44,7 @@ Every analysis project in scRATool is tied to a secure **16-character session to
 
 ---
 
-## 📋 2. Interactive Samplesheet & Input Manager
+## 2. Interactive Samplesheet & Input Manager
 
 The **Samples & Inputs** view lets you construct, edit, and validate your single-cell experimental cohort.
 
@@ -61,7 +61,7 @@ The **Samples & Inputs** view lets you construct, edit, and validate your single
 
 ---
 
-## ⚙️ 3. Dynamic Parameter Configuration
+## ️ 3. Dynamic Parameter Configuration
 
 Every parameter across all 14 stages is dynamically rendered and validated against the Nextflow JSON schema (`nextflow_schema.json`).
 
@@ -81,7 +81,7 @@ Every parameter across all 14 stages is dynamically rendered and validated again
 
 ---
 
-## 📊 4. Run Monitor & Real-Time Log Streaming
+## 4. Run Monitor & Real-Time Log Streaming
 
 Execute your single-cell analysis locally or dispatch it to an institutional compute cluster.
 
@@ -96,7 +96,7 @@ Execute your single-cell analysis locally or dispatch it to an institutional com
 
 ---
 
-## 🖼️ 5. Results Explorer & High-Resolution Lightbox
+## ️ 5. Results Explorer & High-Resolution Lightbox
 
 The **Results Explorer** view organizes all plots and quantitative tables produced across all 14 stages.
 
@@ -111,7 +111,7 @@ The **Results Explorer** view organizes all plots and quantitative tables produc
 
 ---
 
-## 🎯 6. Interactive Plotly UMAP & Lasso Sub-Clustering
+## 6. Interactive Plotly UMAP & Lasso Sub-Clustering
 
 One of scRATool's most powerful capabilities is its **interactive single-cell embedding viewer**.
 

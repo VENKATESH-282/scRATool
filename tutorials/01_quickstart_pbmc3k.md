@@ -4,7 +4,7 @@ This tutorial provides a hands-on, step-by-step walkthrough for analyzing a real
 
 ---
 
-## 📋 Overview & Prerequisites
+## Overview & Prerequisites
 
 By the end of this tutorial, you will:
 1. Download a standard single-cell count matrix.
@@ -21,7 +21,7 @@ By the end of this tutorial, you will:
 
 ---
 
-## 📥 Step 1: Download Benchmark Test Data
+## Step 1: Download Benchmark Test Data
 
 We will download the 10x Genomics 3k PBMC filtered feature-barcode matrix. In your scRATool workspace directory:
 
@@ -38,7 +38,7 @@ curl -o data/pbmc_demo/pbmc3k_filtered_matrix.h5 \
 
 ---
 
-## 📝 Step 2: Create the Samplesheet (`samples.csv`)
+## Step 2: Create the Samplesheet (`samples.csv`)
 
 Create a `samples_pbmc.csv` file in your project directory:
 
@@ -59,7 +59,7 @@ PBMC_Treated_2,Treated,Donor_4,data/pbmc_demo/pbmc_treated_2.h5
 
 ---
 
-## ⚡ Step 3: Run the Pipeline via CLI
+## Step 3: Run the Pipeline via CLI
 
 Run the pipeline using Nextflow with the `local` and `pixi` profiles:
 
@@ -87,27 +87,27 @@ Nextflow will display the execution banner and monitor each stage in real time:
   Profiles Active  : local,pixi
 ================================================================================
 
-[01/14] STAGE_01_QC_FILTERING             [100%] 1 of 1 ✔
-[02/14] STAGE_02_QC_TOOL_COMPARE          [100%] 1 of 1 ✔
-[03/14] STAGE_03_INTEGRATION_CLUSTERING   [100%] 1 of 1 ✔
-[04/14] STAGE_04_CELL_TYPE_ANNOTATION     [100%] 1 of 1 ✔
-[05/14] STAGE_05_DIFFERENTIAL_EXPRESSION  [100%] 1 of 1 ✔
-[06/14] STAGE_06_OBJECT_CONVERSION        [100%] 1 of 1 ✔
-[07/14] STAGE_07_MONOCLE3_TRAJECTORY      [100%] 1 of 1 ✔
-[08/14] STAGE_08_SLINGSHOT_LINEAGES       [100%] 1 of 1 ✔
-[09/14] STAGE_09_CELLCHAT_COMMUNICATION   [100%] 1 of 1 ✔
-[10/14] STAGE_10_NICHENET_SIGNALING       [100%] 1 of 1 ✔
-[11/14] STAGE_11_COPYKAT_CNV              [100%] 1 of 1 ✔
-[12/14] STAGE_12_HDWGCNA_NETWORKS         [100%] 1 of 1 ✔
-[13/14] STAGE_13_VELOCITY_EXPORT          [100%] 1 of 1 ✔
-[14/14] STAGE_14_PUBLICATION_FIGURES      [100%] 1 of 1 ✔
+[01/14] STAGE_01_QC_FILTERING             [100%] 1 of 1 [OK]
+[02/14] STAGE_02_QC_TOOL_COMPARE          [100%] 1 of 1 [OK]
+[03/14] STAGE_03_INTEGRATION_CLUSTERING   [100%] 1 of 1 [OK]
+[04/14] STAGE_04_CELL_TYPE_ANNOTATION     [100%] 1 of 1 [OK]
+[05/14] STAGE_05_DIFFERENTIAL_EXPRESSION  [100%] 1 of 1 [OK]
+[06/14] STAGE_06_OBJECT_CONVERSION        [100%] 1 of 1 [OK]
+[07/14] STAGE_07_MONOCLE3_TRAJECTORY      [100%] 1 of 1 [OK]
+[08/14] STAGE_08_SLINGSHOT_LINEAGES       [100%] 1 of 1 [OK]
+[09/14] STAGE_09_CELLCHAT_COMMUNICATION   [100%] 1 of 1 [OK]
+[10/14] STAGE_10_NICHENET_SIGNALING       [100%] 1 of 1 [OK]
+[11/14] STAGE_11_COPYKAT_CNV              [100%] 1 of 1 [OK]
+[12/14] STAGE_12_HDWGCNA_NETWORKS         [100%] 1 of 1 [OK]
+[13/14] STAGE_13_VELOCITY_EXPORT          [100%] 1 of 1 [OK]
+[14/14] STAGE_14_PUBLICATION_FIGURES      [100%] 1 of 1 [OK]
 
 Pipeline completed successfully! Elapsed time: 4m 12s.
 ```
 
 ---
 
-## 📂 Step 4: Inspect the Output Directory Structure
+## Step 4: Inspect the Output Directory Structure
 
 All results are neatly organized into numbered stage subdirectories under `results_pbmc/`:
 
@@ -152,7 +152,7 @@ results_pbmc/
 
 ---
 
-## 🔬 Step 5: Biological Interpretation of Results
+## Step 5: Biological Interpretation of Results
 
 ### 1. QC & Decontamination (Stage 01 & 02)
 * Check `results_pbmc/01_qc/soupx_ambient_contamination.png`. For peripheral blood, ambient RNA contamination typically ranges between **2% and 5%**. If higher, SoupX automatically subtracts the ambient background profile before downstream clustering.
@@ -178,7 +178,7 @@ Open `results_pbmc/05_differential_expression/volcano_plot_de_genes.png`.
 
 ---
 
-## 🐍 Step 6: Load Results into Python or R
+## Step 6: Load Results into Python or R
 
 Once the pipeline completes, you can immediately continue your exploratory analysis in Python or R:
 
@@ -190,8 +190,8 @@ import scanpy as sc
 adata = sc.read_h5ad("results_pbmc/06_interoperability/adata_processed.h5ad")
 print(adata)
 # AnnData object with n_obs × n_vars = 2638 × 18342
-#   obs: 'sample_id', 'condition', 'consensus_celltype', 'pseudotime'
-#   obsm: 'X_umap', 'X_pca'
+# obs: 'sample_id', 'condition', 'consensus_celltype', 'pseudotime'
+# obsm: 'X_umap', 'X_pca'
 
 # Plot UMAP colored by cell types
 sc.pl.umap(adata, color=["consensus_celltype", "condition"])
@@ -210,7 +210,7 @@ DimPlot(seurat_obj, group.by = "consensus_celltype", label = TRUE)
 
 ---
 
-## 🎯 Next Steps
+## Next Steps
 
 * To run this workflow interactively in your browser with real-time progress bars and interactive Plotly lasso selection, see [Tutorial 2: Web GUI Walkthrough](02_gui_walkthrough.md).
 * To learn how to structure your experimental design with multi-donor replicates, see [Tutorial 3: Samplesheet & Biological Metadata Guide](03_samplesheet_guide.md).
