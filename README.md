@@ -122,55 +122,82 @@ Pipeline execution completed successfully!
 
 ## Pipeline Architecture
 
+scRATool coordinates 14 analytical modules organized into six streamlined, logical phases:
+
 ```mermaid
 flowchart TD
-    subgraph INGESTION ["Universal Ingestion"]
-        A["Single-Cell Data<br/>(10x Directories / .h5 / .h5ad / .txt.gz / .rds / NCBI GEO)"]
+    classDef inputStyle fill:#f8fafc,stroke:#64748b,stroke-width:1.5px,color:#0f172a,rx:6px,ry:6px;
+    classDef qcStyle fill:#f0fdf4,stroke:#22c55e,stroke-width:1.5px,color:#14532d,rx:6px,ry:6px;
+    classDef coreStyle fill:#eff6ff,stroke:#3b82f6,stroke-width:1.5px,color:#1e3a8a,rx:6px,ry:6px;
+    classDef advStyle fill:#faf5ff,stroke:#a855f7,stroke-width:1.5px,color:#581c87,rx:6px,ry:6px;
+    classDef outStyle fill:#fff7ed,stroke:#f97316,stroke-width:1.5px,color:#7c2d12,rx:6px,ry:6px;
+
+    subgraph PHASE1 ["1. Input Ingestion"]
+        INP["Single-Cell Count Matrices<br/>10x Chromium | HDF5 (.h5, .h5ad) | Tabular (.csv.gz) | Seurat RDS | NCBI GEO"]:::inputStyle
     end
 
-    subgraph QC ["Quality Control & Decontamination"]
-        B["Stage 01: QC & Decontamination<br/>(SoupX + DropletUtils + scDblFinder + Adaptive MADs)"]
-        C["Stage 02: QC Tool Comparison<br/>(Empirical Benchmark: SoupX vs. DecontX & scDblFinder vs. DoubletFinder)"]
+    subgraph PHASE2 ["2. Quality Decontamination & Benchmarking"]
+        S01["Stage 01: QC & Ambient Decontamination<br/>SoupX + DropletUtils + scDblFinder + Adaptive MADs"]:::qcStyle
+        S02["Stage 02: Empirical QC Tool Comparison<br/>DecontX vs. SoupX | DoubletFinder vs. scDblFinder"]:::qcStyle
+        S01 --> S02
     end
 
-    subgraph INTEGRATION ["Normalization, Batch Correction & Annotation"]
-        D["Stage 03: Integration & Clustering<br/>(SCTransform v2 + Benchmark: CCA / RPCA / Harmony / FastMNN + kBET/LISI)"]
-        E["Stage 04: Cell-Type Annotation<br/>(Triangulated Consensus Voting: SingleR + scType + scCATCH)"]
-        F["Stage 05: Differential Expression<br/>(Multi-Donor Pseudo-Bulk DESeq2 + clusterProfiler GSEA & Enrichr)"]
-        G["Stage 06: Object Structures<br/>(Cross-Platform Export: Seurat RDS, AnnData .h5ad, SCE, Loom)"]
+    subgraph PHASE3 ["3. Batch Integration & Cell Typing"]
+        S03["Stage 03: Normalization & Multi-Method Integration<br/>SCTransform v2 | Parallel Benchmark: CCA / RPCA / Harmony / FastMNN | kBET & LISI"]:::coreStyle
+        S04["Stage 04: Triangulated Consensus Annotation<br/>Majority Voting: SingleR + scType + scCATCH"]:::coreStyle
+        S03 --> S04
     end
 
-    subgraph ADVANCED ["Trajectory, Networks & Signaling"]
-        H["Stage 07: Monocle 3 Trajectory<br/>(Graph Learning, Pseudotime Manifold & Kinetic Curves)"]
-        I["Stage 08: Slingshot Lineages<br/>(Simultaneous Principal Curves & tradeSeq GAM Dynamics)"]
-        J["Stage 09: CellChat v2 Communication<br/>(Mass-Action Signaling Networks & Interaction Chords)"]
-        K["Stage 10: NicheNet v2 Prioritization<br/>(Mechanistic Sender-to-Receiver Ligand-Target Modeling)"]
-        L["Stage 11: CopyKAT CNV Profiling<br/>(Genomic Aneuploidy vs. Diploid Stromal Resolution)"]
-        M["Stage 12: hdWGCNA Networks<br/>(Metacell Co-Expression Modules & Hub Gene Networks)"]
-        N["Stage 13: Velocity Vector Export<br/>(Spliced/Unspliced Layers for scVelo & CellRank)"]
+    subgraph PHASE4 ["4. Expression Analysis & Ecosystem Structures"]
+        S05["Stage 05: Differential Expression & Functional GSEA<br/>Multi-Donor Pseudo-Bulk DESeq2 + clusterProfiler & Enrichr"]:::coreStyle
+        S06["Stage 06: Cross-Platform Interoperability<br/>Export to Seurat RDS, AnnData (.h5ad), SingleCellExperiment, Loom"]:::coreStyle
     end
 
-    subgraph FIGURES ["Publication Outputs"]
-        O["Stage 14: Publication Figures<br/>(Automated Multi-Panel Composite 300 DPI PNG & Vector PDF)"]
+    subgraph PHASE5 ["5. Advanced Biological Modeling"]
+        subgraph STREAM_TRAJ ["Trajectories & Dynamics"]
+            S07["Stage 07: Monocle 3 Trajectory<br/>Principal Graph Learning & Pseudotime"]:::advStyle
+            S08["Stage 08: Slingshot Lineages<br/>Simultaneous Curves & tradeSeq GAMs"]:::advStyle
+            S13["Stage 13: RNA Velocity Preparation<br/>Spliced / Unspliced Matrices for scVelo"]:::advStyle
+        end
+        subgraph STREAM_COMM ["Intercellular Communication"]
+            S09["Stage 09: CellChat v2 Communication<br/>Mass-Action Signaling Networks & Chords"]:::advStyle
+            S10["Stage 10: NicheNet v2 Prioritization<br/>Mechanistic Ligand-Target Regulation"]:::advStyle
+        end
+        subgraph STREAM_GENOM ["Genomics & Networks"]
+            S11["Stage 11: CopyKAT CNV Profiling<br/>Chromosomal Aneuploidy vs. Diploid Stromal"]:::advStyle
+            S12["Stage 12: hdWGCNA Networks<br/>Metacell Co-expression & Hub Genes"]:::advStyle
+        end
     end
 
-    INGESTION --> B
-    B --> C --> D --> E --> F --> G
-    E --> H
-    E --> I
-    E --> J
-    E --> K
-    E --> L
-    E --> M
-    E --> N
-    F --> O
-    H --> O
-    I --> O
-    J --> O
-    K --> O
-    L --> O
-    M --> O
+    subgraph PHASE6 ["6. Publication Outputs & Interactive Exploration"]
+        S14["Stage 14: Publication Figures<br/>Multi-Panel Composite Visuals (300 DPI PNG & Vector PDF)"]:::outStyle
+        GUI["Interactive Web Analytics<br/>Plotly UMAP Lasso Selection | Custom Cohort CSV Export | Real-Time Monitor"]:::outStyle
+    end
+
+    INP --> S01
+    S02 --> S03
+    S04 --> S05
+    S04 --> S06
+    S04 --> STREAM_TRAJ
+    S04 --> STREAM_COMM
+    S04 --> STREAM_GENOM
+    S05 --> S14
+    STREAM_TRAJ --> S14
+    STREAM_COMM --> S14
+    STREAM_GENOM --> S14
+    S14 --> GUI
 ```
+
+### Dataflow & Execution Hierarchy
+
+| Phase | Stages Covered | Key Computational Objectives | Primary Milestone Outputs |
+| :--- | :--- | :--- | :--- |
+| **Phase 1: Ingestion** | Ingestion Adapter | Automated retrieval and parsing of 10x Chromium folders, H5, tabular text matrices, Seurat RDS, or direct NCBI GEO HTTP/FTP accessions. | Validated single-cell count matrices ready for downstream processing. |
+| **Phase 2: Quality Control** | Stages 01–02 | Dual ambient RNA decontamination (SoupX vs. DecontX), doublet detection benchmarking (scDblFinder vs. DoubletFinder), and adaptive MAD filtering. | High-quality, decontaminated SingleCellExperiment and Seurat objects; concordance scatterplots and Venn diagrams. |
+| **Phase 3: Integration & Annotation** | Stages 03–04 | SCTransform v2 normalization followed by parallel batch correction benchmarking (CCA, RPCA, Harmony, FastMNN) scored by kBET and LISI; triangulated consensus cell-type voting (SingleR + scType + scCATCH). | Quantitatively validated integrated UMAP embedding and high-confidence cell-type identity assignments. |
+| **Phase 4: Comparative Analytics** | Stages 05–06 | Statistically principled multi-donor pseudo-bulk differential expression (DESeq2) with clusterProfiler GSEA and Enrichr pathway analysis; seamless cross-platform format serialization. | Volcano plots, functional enrichment dotplots, and exported AnnData (`.h5ad`), SCE (`.rds`), and Loom files. |
+| **Phase 5: Systems-Level Modeling** | Stages 07–13 | Parallel biological exploration covering dynamic branching trajectories (Monocle 3, Slingshot), cell-cell communication (CellChat v2, NicheNet v2), genomic aneuploidy (CopyKAT), co-expression networks (hdWGCNA), and RNA velocity vectors (scVelo). | Trajectory manifolds, interaction chord diagrams, ligand-target circuits, CNV profiles, module dendrograms, and velocity layers. |
+| **Phase 6: Synthesis & Dissemination** | Stage 14 & Web GUI | Automated assembly of publication-ready 300 DPI composite panels and vector PDFs, paired with interactive browser-based Plotly UMAP exploration and lasso subpopulation isolation. | High-resolution publication figures and custom barcode cohort CSV subsets for focused downstream analysis. |
 
 ---
 
