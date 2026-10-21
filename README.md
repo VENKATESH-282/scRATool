@@ -2,7 +2,7 @@
 
 # scRATool
 ### Universal Single-Cell RNA Sequencing Downstream Analysis Platform
-**Reproducible Nextflow DSL2 Workflow • Seurat v5 & Bioconductor Engine • Asynchronous FastAPI Web GUI**
+**Reproducible Nextflow DSL2 Workflow • Pixi • Seurat v5 & Bioconductor Engine • Asynchronous FastAPI Web GUI**
 
 [![GitHub release](https://img.shields.io/badge/Release-v1.0.0-blue.svg)](https://github.com/VENKATESH-282/scRATool/releases)
 [![Nextflow](https://img.shields.io/badge/Nextflow-DSL2-brightgreen.svg)](https://www.nextflow.io/)
