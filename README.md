@@ -2,48 +2,129 @@
 
 # 🧬 scRATool
 ### Universal Single-Cell RNA Sequencing Downstream Analysis Platform
-**Nextflow DSL2 Orchestration • Seurat 5 & Bioconductor Engine • Asynchronous FastAPI Web GUI**
+**Reproducible Nextflow DSL2 Workflow • Seurat v5 & Bioconductor Engine • Asynchronous FastAPI Web GUI**
 
 [![GitHub release](https://img.shields.io/badge/Release-v1.0.0-blue.svg)](https://github.com/VENKATESH-282/scRATool/releases)
 [![Nextflow](https://img.shields.io/badge/Nextflow-DSL2-brightgreen.svg)](https://www.nextflow.io/)
 [![Framework: Seurat 5](https://img.shields.io/badge/Framework-Seurat%20v5.1-0284c7.svg)](https://satijalab.org/seurat/)
+[![Bioconductor](https://img.shields.io/badge/Bioconductor-3.19-12558a.svg)](https://bioconductor.org/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20Async-009688.svg)](https://fastapi.tiangolo.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg)](https://www.python.org/)
 [![R: 4.4+](https://img.shields.io/badge/R-4.4%2B-276DC3.svg)](https://www.r-project.org/)
 
 <p align="center">
-  <a href="#-quickstart-tutorial-5-minutes">Quickstart Tutorial</a> •
-  <a href="#-web-gui-walkthrough">Web GUI Tour</a> •
-  <a href="#-the-14-analysis-stages">14 Analysis Stages</a> •
-  <a href="#-input-formats--samplesheet-guide">Data Inputs</a> •
-  <a href="#-hpc-cluster--slurm-execution">HPC Cluster Guide</a> •
-  <a href="#-troubleshooting--faq">Troubleshooting</a> •
-  <a href="#-citation">Citation</a>
+  <a href="#-quickstart-in-60-seconds">⚡ 60-Second Quickstart</a> •
+  <a href="#-web-gui-tour--interactive-umap">🖥️ Web GUI Tour</a> •
+  <a href="#-pipeline-architecture">🏛️ Architecture</a> •
+  <a href="#-the-14-analysis-stages">🔬 14 Stages</a> •
+  <a href="#-multi-method-benchmarking">📊 Benchmarking</a> •
+  <a href="#-samplesheet--input-formats">📁 Data Inputs</a> •
+  <a href="#-hpc-cluster--slurm-dispatch">🖥️ HPC Cluster</a> •
+  <a href="#-in-depth-tutorials">📚 Tutorials</a>
 </p>
 
 ---
 
 </div>
 
-## 📖 Overview
+## 📖 What is scRATool?
 
-**scRATool** (*single-cell Reproducible Automated Tool*) is a comprehensive, production-grade downstream analysis platform that automates the entire single-cell data science lifecycle. It unites **fourteen modular analytical stages**—from raw count matrix decontamination through multi-method batch integration, consensus cell-type annotation, trajectory modeling, intercellular communication networks, and RNA velocity vector preparation—within a strictly reproducible **Nextflow DSL2** engine.
+**scRATool** (*single-cell Reproducible Automated Tool*) is an end-to-end downstream analysis platform that automates the entire single-cell data science lifecycle. It integrates **14 modular analytical stages**—from raw count matrix decontamination through multi-method batch integration, consensus cell-type annotation, trajectory modeling, intercellular communication networks, and RNA velocity vector preparation—within a deterministic **Nextflow DSL2** engine.
 
-Built for both experimental biologists and computational bioinformaticians, scRATool bridges the gap between zero-code accessibility and deep methodological rigour:
+### Why scRATool?
+* **Zero Scripting for Biologists:** An interactive, browser-based graphical user interface (GUI) provides real-time stage monitoring, parameter configuration, high-resolution plot exploration, and an **interactive Plotly UMAP with Lasso/Box subpopulation selection** to dynamically isolate cell cohorts and export custom metadata.
+* **Deterministic Rigour for Bioinformaticians:** Orchestrated via Nextflow DSL2 with built-in multi-method benchmarking (SoupX vs. DecontX, scDblFinder vs. DoubletFinder, Seurat CCA vs. RPCA vs. Harmony vs. FastMNN), multi-donor pseudo-bulk DESeq2 testing, automated checkpoint-and-resume caching (`-resume`), and multi-format object export (`.rds`, `.h5ad`, `SingleCellExperiment`, `Loom`).
+* **Universal Matrix Ingestion:** Ingests 10x Genomics Cell Ranger directories, HDF5 (`.h5`, `.h5ad`), compressed tabular matrices (`.csv.gz`, `.tsv.gz`), serialized Seurat `.rds` objects, or remote NCBI GEO accessions directly over HTTPS.
+* **Turnkey HPC Cluster Execution:** Built-in Paramiko SSH/SFTP profile manager connects to SLURM, SGE, or PBS clusters with visual directory browsing, automatic samplesheet synchronization, and detached background execution.
 
-* **For Biologists:** A responsive, browser-based graphical user interface (GUI) powered by FastAPI and Plotly.js provides interactive UMAP exploration, lasso sub-clustering, visual stage monitoring, and one-click remote HPC cluster job dispatch.
-* **For Bioinformaticians:** A deterministic Nextflow DSL2 pipeline supporting multi-method benchmarking (SoupX vs. DecontX, scDblFinder vs. DoubletFinder, CCA vs. RPCA vs. Harmony vs. FastMNN), native checkpoint-and-resume execution, and cross-platform object export (`.rds`, `.h5ad`, `SingleCellExperiment`, `Loom`).
+---
+
+## ⚡ Quickstart in 60 Seconds
+
+You can run scRATool either through the **interactive Web GUI** or headlessly via the **command line (CLI)**.
+
+### Option 1: Launch the Interactive Web GUI (Recommended)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/VENKATESH-282/scRATool.git
+cd scRATool
+
+# 2. Set up Python environment & dependencies
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# 3. Launch the web application
+./start.sh
+```
+
+Now open your browser and navigate to:
+👉 **`http://localhost:8051`**
+
+```text
+================================================================================
+  scRATool - Universal Single-Cell RNA-seq Analysis Platform
+  Local URL:    http://localhost:8051
+  Network URL:  http://127.0.0.1:8051
+  Press Ctrl+C to stop the server.
+================================================================================
+```
+
+---
+
+### Option 2: Run Headlessly via Nextflow CLI
+
+If you already have Nextflow and Pixi installed, run a test validation run in one command:
+
+```bash
+# Install bioinformatics environment via Pixi (one-time setup)
+cd pipeline && pixi install && cd ..
+
+# Run test profile using synthetic single-cell matrices
+nextflow run pipeline/main.nf \
+    -profile test,local,pixi \
+    -resume
+```
+
+### Expected Terminal Output:
+```text
+================================================================================
+  scRATool: Universal Single-Cell RNA-seq Analysis Platform (v1.0.0)
+================================================================================
+  Samplesheet      : assets/test_data/samples_test.csv
+  Output Dir       : results_test/
+  Organism         : human
+  Ref Condition    : CTRL
+  Profiles Active  : test,local,pixi
+================================================================================
+
+[01/14] STAGE_01_QC_FILTERING             [100%] 1 of 1 ✔
+[02/14] STAGE_02_QC_TOOL_COMPARE          [100%] 1 of 1 ✔
+[03/14] STAGE_03_INTEGRATION_CLUSTERING   [100%] 1 of 1 ✔
+[04/14] STAGE_04_CELL_TYPE_ANNOTATION     [100%] 1 of 1 ✔
+[05/14] STAGE_05_DIFFERENTIAL_EXPRESSION  [100%] 1 of 1 ✔
+[06/14] STAGE_06_OBJECT_CONVERSION        [100%] 1 of 1 ✔
+[07/14] STAGE_07_MONOCLE3_TRAJECTORY      [100%] 1 of 1 ✔
+[08/14] STAGE_08_SLINGSHOT_LINEAGES       [100%] 1 of 1 ✔
+[09/14] STAGE_09_CELLCHAT_COMMUNICATION   [100%] 1 of 1 ✔
+[10/14] STAGE_10_NICHENET_SIGNALING       [100%] 1 of 1 ✔
+[11/14] STAGE_11_COPYKAT_CNV              [100%] 1 of 1 ✔
+[12/14] STAGE_12_HDWGCNA_NETWORKS         [100%] 1 of 1 ✔
+[13/14] STAGE_13_VELOCITY_EXPORT          [100%] 1 of 1 ✔
+[14/14] STAGE_14_PUBLICATION_FIGURES      [100%] 1 of 1 ✔
+
+Pipeline execution completed successfully!
+```
 
 ---
 
 ## 🏛️ Pipeline Architecture
 
-The workflow ingests single-cell count matrices from any source and processes them through 14 modular, containerized stages:
-
 ```mermaid
 flowchart TD
-    subgraph INGESTION ["📥 Flexible Ingestion"]
+    subgraph INGESTION ["📥 Universal Ingestion"]
         A["Single-Cell Data<br/>(10x Directories / .h5 / .h5ad / .txt.gz / .rds / NCBI GEO)"]
     end
 
@@ -53,7 +134,7 @@ flowchart TD
     end
 
     subgraph INTEGRATION ["🧩 Normalization, Batch Correction & Annotation"]
-        D["Stage 03: Integration & Clustering<br/>(SCTransform v2 + Parallel Benchmark: CCA / RPCA / Harmony / FastMNN + kBET/LISI)"]
+        D["Stage 03: Integration & Clustering<br/>(SCTransform v2 + Benchmark: CCA / RPCA / Harmony / FastMNN + kBET/LISI)"]
         E["Stage 04: Cell-Type Annotation<br/>(Triangulated Consensus Voting: SingleR + scType + scCATCH)"]
         F["Stage 05: Differential Expression<br/>(Multi-Donor Pseudo-Bulk DESeq2 + clusterProfiler GSEA & Enrichr)"]
         G["Stage 06: Object Structures<br/>(Cross-Platform Export: Seurat RDS, AnnData .h5ad, SCE, Loom)"]
@@ -93,119 +174,65 @@ flowchart TD
 
 ---
 
-## 🚀 Quickstart Tutorial (5 Minutes)
-
-Follow this step-by-step guide to clone, install, and run a full test verification on your local machine.
-
-### Step 1: Clone the Repository
-```bash
-git clone https://github.com/VENKATESH-282/scRATool.git
-cd scRATool
-```
-
-### Step 2: Set Up Python Dependencies
-Create a virtual environment or use Conda:
-```bash
-# Using Python venv
-python3 -m venv venv
-source venv/bin/activate
-
-# Install web interface & SSH dependencies
-pip install -r requirements.txt
-```
-
-### Step 3: Install Bioinformatics Pipeline Dependencies (Pixi)
-scRATool uses [Pixi](https://pixi.sh/) to manage exact, reproducible R and Bioconductor environments:
-```bash
-# Install Pixi (if not already installed)
-curl -fsSL https://pixi.sh/install.sh | bash
-source ~/.bashrc
-
-# Lock and install pipeline environment
-cd pipeline
-pixi install
-cd ..
-```
-
-### Step 4: Launch the scRATool Web GUI
-Start the server with the included launcher:
-```bash
-./start.sh
-```
-
-Open your browser and navigate to:
-👉 **`http://localhost:8051`**
-
-```text
-============================================================
- scRATool - Universal Single-Cell RNA-seq Analysis Platform
- Local URL:    http://localhost:8051
- Network URL:  http://127.0.0.1:8051
- Press Ctrl+C to stop the server.
-============================================================
-```
-
----
-
-## 🖥️ Web GUI Walkthrough
+## 🖥️ Web GUI Tour & Interactive UMAP
 
 The scRATool web platform provides six dedicated views:
 
-### 1. Dashboard & Workspace Session Manager
+### 1. Workspace Session Manager
 Switch between project workspaces instantly with **16-character session tokens** (e.g. `8CPN-MM8W-3A2Q-Z6U4`). Each workspace provides complete project isolation, cloned parameter state, and independent run histories.
 
 <p align="center">
-  <img src="screenshots/landing_1440x900.png" width="90%" alt="scRATool Dashboard" />
+  <img src="screenshots/landing_1440x900.png" width="95%" alt="scRATool Dashboard" />
 </p>
 
-### 2. Samplesheet & Input Manager
-Manage your single-cell experimental design directly in an interactive spreadsheet editor. Features:
-* **Direct Path Existence Verification:** Real-time checking of whether `.h5`, `.txt.gz`, or Cell Ranger folders exist on disk or cluster storage.
+### 2. Samplesheet & Real-Time Path Validation
+Manage your experimental cohort directly in an interactive spreadsheet editor:
+* **Real-Time Path Existence Verification:** Displays live green status tags when `.h5`, `.txt.gz`, or Cell Ranger folders are detected on disk or cluster storage.
 * **Bulk Directory Prefix Helper:** Prepend common cluster mount points (e.g., `/data/single_cell_runs/`) to relative sample paths in one click.
 * **NCBI GEO Auto-Fetch:** Enter a GSE accession (e.g. `GSE174609`) to automatically query the NCBI FTP server, retrieve supplementary count matrices, and populate samplesheet rows.
 
 <p align="center">
-  <img src="screenshots/samples_tab_preview.png" width="90%" alt="Samplesheet Manager" />
+  <img src="screenshots/samples_tab_preview.png" width="95%" alt="Samplesheet Manager" />
 </p>
 
-### 3. Pipeline Parameter Configuration
-Every parameter across all 14 stages is dynamically rendered and validated from `nextflow_schema.json` (Draft-07 specification). Choose from 1-click biological presets:
+### 3. Dynamic Parameter Configuration
+Every parameter across all 14 stages is dynamically rendered and validated against `nextflow_schema.json` (Draft-07 specification). Choose from 1-click biological presets:
 * **Standard Publication Workflow**
 * **Rapid Test / Stub Run**
 * **Deep Discovery & Signaling**
 
 <p align="center">
-  <img src="screenshots/params_1440x900_light.png" width="90%" alt="Parameter Configuration" />
+  <img src="screenshots/params_1440x900_light.png" width="95%" alt="Parameter Configuration" />
 </p>
 
 ### 4. Run Monitor & Real-Time Log Streaming
 Execute locally or dispatch to a remote SLURM cluster. Track stage progression through a live visual state tracker (Stages 01–14) with real-time Server-Sent Events (SSE) log streaming from `.nextflow.log`.
 
 <p align="center">
-  <img src="screenshots/monitor_1440x900_light.png" width="90%" alt="Run Monitor & Terminal" />
+  <img src="screenshots/monitor_1440x900_light.png" width="95%" alt="Run Monitor & Terminal" />
 </p>
 
-### 5. Results Explorer & High-Resolution Lightbox Zoom
+### 5. Results Explorer & High-Resolution Lightbox
 Browse outputs generated by every stage. Includes an image gallery with a **modal lightbox zoom** for reviewing publication-ready figures and searchable CSV data tables.
 
 <p align="center">
-  <img src="screenshots/explorer_stage04_real_plots.png" width="90%" alt="Results Explorer Gallery" />
+  <img src="screenshots/explorer_stage04_real_plots.png" width="95%" alt="Results Explorer Gallery" />
 </p>
 
 ### 6. Interactive Plotly UMAP with Lasso Sub-Clustering
-Inspect single-cell embeddings colored by consensus cell types, conditions, or biomarker expression.
-* **Lasso & Box Selection:** Draw freely around any interesting cell population.
+Inspect single-cell embeddings colored by consensus cell types, conditions, or continuous biomarker expression:
+* **Lasso & Box Selection:** Draw freely around any interesting cell population or transitional state.
 * **Custom Cohort Export:** Give your selected cells a custom cohort name and biological description, then export them as targeted metadata CSV subsets (`assets/custom_groups/*.csv`) for focused downstream re-clustering or targeted WGCNA.
 
 <p align="center">
-  <img src="screenshots/explorer_real_umap_celltype.png" width="90%" alt="Interactive UMAP & Lasso" />
+  <img src="screenshots/explorer_real_umap_celltype.png" width="95%" alt="Interactive UMAP & Lasso Sub-Clustering" />
 </p>
 
 ---
 
 ## 🔬 The 14 Analysis Stages
 
-| Stage | Module Name | Primary Objective | Key Tools / Packages | Primary Published Outputs |
+| Stage | Module Name | Primary Objective | Algorithmic Tools | Published Outputs |
 | :---: | :--- | :--- | :--- | :--- |
 | **01** | **QC & Decontamination** | Ambient RNA correction, empty droplet separation, doublet scoring, adaptive MAD filtering | SoupX v1.6.2, DropletUtils v1.22, scDblFinder v1.16, Seurat v5.1 | Filtered Seurat objects, per-sample QC violin plots, filtering summary CSV |
 | **02** | **QC Tool Comparison** | Empirical benchmarking of competing decontamination and doublet detection methodologies | Celda DecontX v1.14, DoubletFinder v2.0.4, scDblFinder v1.16 | Decontamination distributions, doublet caller concordance Venn diagrams |
@@ -224,19 +251,41 @@ Inspect single-cell embeddings colored by consensus cell types, conditions, or b
 
 ---
 
-## 📁 Input Formats & Samplesheet Guide
+## 📊 Multi-Method Benchmarking
 
-scRATool accepts count matrices across **five flexible entry modes** without requiring raw FASTQ re-alignment:
+Unlike conventional "black box" pipelines, scRATool provides quantitative empirical comparisons:
+
+### 1. Ambient RNA Removal: SoupX vs. DecontX
+* **SoupX** models ambient contamination using empty droplets ($< 100$ UMIs) to calculate global contamination fraction $\rho$.
+* **DecontX** uses a Bayesian mixture model to estimate per-cell contamination without requiring empty droplets.
+* **Benchmark Output:** Stage 02 outputs a Pearson correlation scatterplot (`decontx_vs_soupx_scatter.png`) comparing both estimators per cluster.
+
+### 2. Doublet Scoring: scDblFinder vs. DoubletFinder
+* **scDblFinder** simulates synthetic doublets and trains an iterative gradient-boosted classifier.
+* **DoubletFinder** generates artificial doublets ($pN$) and scores cells by proportion of artificial nearest neighbors ($pANN$).
+* **Benchmark Output:** Stage 02 computes a concordance Venn diagram (`doublet_callers_concordance.png`) and purges consensus doublets.
+
+### 3. Batch Integration: CCA vs. RPCA vs. Harmony vs. FastMNN
+Stage 03 evaluates normalized embeddings against two quantitative metrics:
+* **kBET (k-nearest neighbor Batch Effect Test):** Rejection rate measuring local batch mixing (lower = superior mixing).
+* **LISI (Local Inverse Simpson's Index):** Evaluates batch diversity (iLISI) while preserving cell-type separation (cLISI).
+* The top-performing integration is automatically selected and passed to Stage 04.
+
+---
+
+## 📁 Samplesheet & Input Formats
+
+scRATool accepts count matrices across **five flexible entry modes**:
 
 ```csv
 sample_id,condition,patient_id,file_path
-Sample_CTRL_1,CTRL,Donor_A,data/10x_runs/CTRL_1/outs/filtered_feature_bc_matrix/
-Sample_CTRL_2,CTRL,Donor_B,data/CTRL_2.h5
-Sample_TREATED_1,TREATED,Donor_C,data/TREATED_1.csv.gz
-Sample_TREATED_2,TREATED,Donor_D,https://ftp.ncbi.nlm.nih.gov/geo/series/GSE117nnn/GSE117988/suppl/GSE117988_raw.csv.gz
+Sample_CTRL_1,Control,Donor_A,data/10x_runs/CTRL_1/outs/filtered_feature_bc_matrix/
+Sample_CTRL_2,Control,Donor_B,data/CTRL_2.h5
+Sample_TREATED_1,Treated,Donor_C,data/TREATED_1.csv.gz
+Sample_TREATED_2,Treated,Donor_D,https://ftp.ncbi.nlm.nih.gov/geo/series/GSE117nnn/GSE117988/suppl/GSE117988_raw.csv.gz
 ```
 
-* **10x Chromium Directories:** Folder containing `matrix.mtx.gz`, `barcodes.tsv.gz`, and `features.tsv.gz`.
+* **10x Chromium Outs Directory:** Folder containing `matrix.mtx.gz`, `barcodes.tsv.gz`, and `features.tsv.gz`.
 * **HDF5 Matrices:** Standard `.h5` or `.h5ad` files.
 * **Compressed Tables:** `.txt.gz`, `.csv.gz`, or `.tsv.gz` (genes as rows, cell barcodes as columns).
 * **Pre-Built Objects:** Serialized `.rds` Seurat objects.
@@ -244,7 +293,7 @@ Sample_TREATED_2,TREATED,Donor_D,https://ftp.ncbi.nlm.nih.gov/geo/series/GSE117n
 
 ---
 
-## 🖥️ HPC Cluster & SLURM Execution
+## 🖥️ HPC Cluster & SLURM Dispatch
 
 You can dispatch scRATool jobs to any HPC cluster (SLURM, SGE, PBS) directly through the web GUI:
 
@@ -260,77 +309,77 @@ You can dispatch scRATool jobs to any HPC cluster (SLURM, SGE, PBS) directly thr
 
 ---
 
-## 🔬 Headless Command-Line Execution (CLI)
+## 📚 In-Depth Tutorials
 
-For bioinformaticians running automated batches on compute clusters:
+Explore our dedicated, step-by-step guides covering every facet of single-cell analysis:
 
-```bash
-# Local Workstation Execution
-nextflow run pipeline/main.nf \
-    --samples samples.csv \
-    --outdir results/ \
-    --organism human \
-    -profile local,pixi \
-    -resume
+* 📖 **[Tutorial 1: Quickstart with 10x Genomics PBMC Data](tutorials/01_quickstart_pbmc3k.md)** — Complete hands-on tutorial using real PBMC count matrices, from download to publication figures.
+* 🖥️ **[Tutorial 2: Web GUI Walkthrough & Interactive UMAP Manual](tutorials/02_gui_walkthrough.md)** — Visual tour of workspace session tokens, samplesheet builder, live SSE terminal, and Plotly lasso sub-clustering.
+* 📋 **[Tutorial 3: Samplesheet & Biological Metadata Guide](tutorials/03_samplesheet_guide.md)** — Comprehensive guide to 10x directories, H5 files, compressed CSVs, and multi-donor experimental designs.
+* 🚀 **[Tutorial 4: Enterprise HPC & SLURM Deployment](tutorials/04_hpc_slurm_guide.md)** — Remote SSH/SFTP architecture, cluster profiles, memory escalation on OOM, and headless execution.
+* 🔬 **[Tutorial 5: QC Decontamination & Batch Integration Benchmarking](tutorials/05_qc_and_benchmarking.md)** — SoupX vs DecontX ambient RNA correction, doublet detection, and quantitative kBET/LISI evaluation.
+* 🏷️ **[Tutorial 6: Consensus Cell Typing & Pseudo-bulk Differential Expression](tutorials/06_annotation_and_differential_expression.md)** — Triangulated annotation (SingleR + scType + scCATCH) and avoiding single-cell pseudoreplication with DESeq2.
+* 🛤️ **[Tutorial 7: Trajectories, Intercellular Signaling & Gene Networks](tutorials/07_advanced_trajectories_and_signaling.md)** — Monocle 3, Slingshot, CellChat v2, NicheNet v2, CopyKAT CNV, and hdWGCNA co-expression networks.
+* 🛡️ **[Tutorial 8: Custom Organisms, Tissues & Allowlist Biomarker Rescue](tutorials/08_custom_biology_and_allowlists.md)** — Analyzing Mouse/non-human datasets and preserving ultra-rare disease biomarkers from being discarded during QC.
 
-# SLURM Cluster Execution
-nextflow run pipeline/main.nf \
-    --samples samples.csv \
-    --outdir /scratch/project/results/ \
-    --organism human \
-    -profile slurm,pixi \
-    -resume
+---
+
+## 📂 Repository Directory Structure
+
+```text
+scRATool/
+├── app/                              # FastAPI asynchronous web application backend
+│   ├── main.py                       # Server entrypoint and API router mounting
+│   ├── config.py                     # Global configuration and path discovery
+│   ├── db.py                         # SQLite database initialization
+│   ├── runner.py                     # Local Nextflow subprocess management
+│   ├── remote_runner.py              # Remote HPC Nextflow execution manager
+│   ├── remote/                       # SSH/SFTP connection and file management
+│   └── routers/                      # REST API endpoints (sessions, samples, params, logs)
+├── pipeline/                         # Deterministic Nextflow DSL2 engine
+│   ├── main.nf                       # Master pipeline orchestrator (Stages 01–14)
+│   ├── nextflow.config               # Engine configuration and execution profiles
+│   ├── pixi.toml                     # Declarative R 4.4 & Bioconductor lockfile
+│   ├── bin/                          # 14 modular R analysis scripts (Stages 01–14)
+│   ├── conf/                         # Resource profiles (base.config, cluster.config, test.config)
+│   └── assets/                       # Test datasets and canonical reference dictionaries
+├── static/                           # Web GUI frontend assets (CSS, JS, Plotly vendor)
+├── templates/                        # Jinja2 HTML single-page application
+├── tutorials/                        # In-depth, tutorial-grade documentation guides (01–08)
+├── screenshots/                      # High-resolution application screenshots and previews
+├── start.sh                          # One-click startup launcher script
+├── requirements.txt                  # Python web dependencies
+└── nextflow_schema.json              # Draft-07 JSON schema for automated parameter validation
 ```
 
 ---
 
-## 🛠️ Troubleshooting & FAQ
+## 🛠️ Frequently Asked Questions & Troubleshooting
 
 <details>
-<summary><b>1. Nextflow command not found</b></summary>
+<summary><b>1. How does Checkpoint-and-Resume (-resume) work?</b></summary>
 
-Ensure Nextflow is installed and in your `PATH`:
-```bash
-curl -s https://get.nextflow.io | bash
-sudo mv nextflow /usr/local/bin/
-```
-Or set the environment variable:
-```bash
-export NEXTFLOW_BIN="/path/to/nextflow"
-```
+Nextflow hashes all stage inputs, code scripts, and parameters into a unique signature. If a pipeline run is interrupted or if you modify parameters in Stage 07, running with `-resume` (enabled by default in the GUI) instantly retrieves cached results from Stages 01–06 without re-computing them, reducing turnaround time by over 90%.
 </details>
 
 <details>
-<summary><b>2. R library or Bioconductor package installation issues</b></summary>
+<summary><b>2. How can I scale to massive datasets (>100,000 cells)?</b></summary>
 
-scRATool uses Pixi to pin exact, binary-compatible R and Bioconductor packages, preventing version mismatches:
-```bash
-cd pipeline
-pixi clean
-pixi install
-```
+For massive datasets, activate the `cluster` profile in `pipeline/conf/cluster.config`. Nextflow's automatic retry strategy catches Out-Of-Memory signals (Exit code 137 or 247) and dynamically doubles the requested memory before re-submitting the job to the SLURM queue.
 </details>
 
 <details>
-<summary><b>3. Large dataset memory optimization (>100,000 cells)</b></summary>
+<summary><b>3. Can I run scRATool on macOS or Windows?</b></summary>
 
-For massive datasets, activate the `hpc_large` resource tier in `pipeline/conf/cluster.config` or increase memory thresholds in the Parameters GUI tab. Nextflow's automatic retry strategy dynamically doubles memory allocation upon encountering any transient Out-Of-Memory (OOM) signal.
+* **macOS:** Fully supported on both Apple Silicon (M1/M2/M3) and Intel via Pixi.
+* **Windows:** Fully supported via Windows Subsystem for Linux 2 (WSL2 Ubuntu 22.04+).
 </details>
 
 <details>
-<summary><b>4. How does Checkpoint-and-Resume work?</b></summary>
+<summary><b>4. How do I cite scRATool in my research?</b></summary>
 
-Nextflow hashes all stage inputs, code scripts, and parameters. If a pipeline run is interrupted or if you modify parameters in Stage 07, running with `-resume` (enabled by default in the GUI) instantly retrieves cached results from Stages 01–06 without re-computing them, reducing turnaround time by over 90%.
+Please see the [Citation](#-citation) section below.
 </details>
-
----
-
-## 📚 Dedicated Tutorials
-
-* [Tutorial 1: Complete Web GUI Walkthrough](tutorials/01_gui_walkthrough.md)
-* [Tutorial 2: Remote SLURM Cluster Configuration](tutorials/02_hpc_cluster_guide.md)
-* [Tutorial 3: Samplesheet & Biological Metadata Formatting](tutorials/03_samplesheet_guide.md)
-* [Tutorial 4: Custom Allowlist Gene Preservation & Biomarker Rescue](tutorials/04_gene_allowlist_guide.md)
 
 ---
 
